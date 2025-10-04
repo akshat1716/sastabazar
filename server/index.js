@@ -7,24 +7,23 @@ const path = require('path');
 const { config, validateConfig, getCorsConfig } = require('./config');
 const dbConnection = require('./config/database');
 const { rateLimits, createSecurityMiddleware } = require('./config/security');
-const { 
-  logger, 
-  httpLogger, 
-  correlationIdMiddleware, 
-  logStartup, 
+const {
+  logger,
+  httpLogger,
+  correlationIdMiddleware,
+  logStartup,
   logShutdown,
-  logHealthCheck 
+  logHealthCheck
 } = require('./config/logger');
-const { 
-  sentryMiddleware, 
-  errorReportingMiddleware, 
-  performanceMiddleware 
+const {
+  sentryMiddleware,
+  errorReportingMiddleware,
+  performanceMiddleware
 } = require('./config/sentry');
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
 
 // Validate configuration
 validateConfig();
-
 logger.info('DEBUG: Shopify Domain Loaded =', config.shopify.storeDomain);
 
 const authRoutes = require('./routes/auth');
@@ -41,7 +40,13 @@ const databaseViewerRoutes = require('./routes/database-viewer');
 const shopifyRoutes = require('./routes/shopify');
 
 const app = express();
-const PORT = config.port;
+
+/** ===== Render port binding (FIXED) ===== */
+const PORT = process.env.PORT || config.port || 3000;   // use Render's PORT first
+const HOST = '0.0.0.0';                                 // bind to all interfaces
+
+/** Health for Render (root) */
+app.get('/health', (_req, res) => res.status(200).json({ ok: true }));
 
 // Sentry middleware (must be first)
 app.use(sentryMiddleware.requestHandler);
@@ -54,8 +59,9 @@ app.use(correlationIdMiddleware);
 app.use(...createSecurityMiddleware());
 app.use(compression());
 
-// CORS configuration
+// CORS configuration (uses env-driven getCorsConfig)
 app.use(cors(getCorsConfig()));
+app.options('*', cors()); // allow preflights globally
 
 // HTTP request logging
 app.use(httpLogger);
@@ -70,10 +76,10 @@ app.use('/api/', rateLimits.general);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Database connection
+// Database connection (make sure this does NOT process.exit on failure)
 dbConnection.connect();
 
-// Health check endpoint
+/** API Health endpoints */
 app.get('/api/health', (req, res) => {
   const healthData = {
     status: 'OK',
@@ -82,25 +88,23 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     correlationId: req.correlationId
   };
-  
   logHealthCheck('api', 'healthy', { correlationId: req.correlationId });
   res.json(healthData);
 });
 
-// Database health check endpoint
 app.get('/api/health/db', async (req, res) => {
   try {
     const healthStatus = await dbConnection.healthCheck();
-    logHealthCheck('database', healthStatus.status, { 
+    logHealthCheck('database', healthStatus.status, {
       correlationId: req.correlationId,
       dbName: healthStatus.dbName,
-      host: healthStatus.host 
+      host: healthStatus.host
     });
     res.json(healthStatus);
   } catch (error) {
-    logHealthCheck('database', 'unhealthy', { 
+    logHealthCheck('database', 'unhealthy', {
       correlationId: req.correlationId,
-      error: error.message 
+      error: error.message
     });
     res.status(500).json({
       status: 'error',
@@ -117,7 +121,7 @@ if (config.nodeEnv === 'production') {
   app.use(express.static(path.join(__dirname, '../client/dist')));
 }
 
-// API Routes with specific rate limiting
+// API Routes
 app.use('/api/auth', rateLimits.auth, authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
@@ -131,10 +135,8 @@ app.use('/api/webhooks', webhookRoutes);
 app.use('/api/db', databaseViewerRoutes);
 app.use('/api/shopify', shopifyRoutes);
 
-// Error reporting middleware
+// Error reporting & handling
 app.use(errorReportingMiddleware);
-
-// Error handling middleware
 app.use(errorHandler);
 
 // 404 handler for API routes
@@ -152,17 +154,19 @@ if (config.nodeEnv === 'production') {
   });
 }
 
-const server = app.listen(PORT, () => {
+/** ===== Listen (FIXED) ===== */
+const server = app.listen(PORT, HOST, () => {
   logStartup('sastabazar-api', '1.0.0', config.nodeEnv, PORT);
+  logger.info(`✅ Server listening on http://${HOST}:${PORT}`);
 });
 
-// Graceful shutdown
+/** Graceful shutdown */
 const gracefulShutdown = (signal) => {
   logShutdown('sastabazar-api', `Received ${signal}`);
-  
+
   server.close(() => {
     logger.info('HTTP server closed');
-    
+
     // Close database connection
     dbConnection.disconnect().then(() => {
       logger.info('Database connection closed');
@@ -172,7 +176,7 @@ const gracefulShutdown = (signal) => {
       process.exit(1);
     });
   });
-  
+
   // Force close after 10 seconds
   setTimeout(() => {
     logger.error('Forced shutdown after timeout');
