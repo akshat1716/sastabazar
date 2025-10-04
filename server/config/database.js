@@ -14,26 +14,20 @@ class DatabaseConnection {
 
   async connect() {
     try {
+      const uri = process.env.MONGODB_URI;
+      if (!uri) throw new Error('MONGODB_URI is missing');
+      
       logger.info('🔄 Connecting to MongoDB Atlas...');
       
       const options = {
-        maxPoolSize: config.database.options.maxPoolSize,
-        serverSelectionTimeoutMS: config.database.options.serverSelectionTimeoutMS,
-        socketTimeoutMS: config.database.options.socketTimeoutMS,
-        bufferCommands: config.database.options.bufferCommands,
-        dbName: 'sastabazar', // Standardized database name
-        // Connection pool optimization
-        minPoolSize: 2,
-        maxIdleTimeMS: 30000,
-        waitQueueTimeoutMS: 5000,
-        // Read preferences for production
-        readPreference: 'secondaryPreferred',
-        // Write concern for production
-        writeConcern: { w: 'majority', j: true, wtimeout: 5000 }
+        serverSelectionTimeoutMS: 8000,
+        maxPoolSize: 10,
+        socketTimeoutMS: 45000,
+        bufferCommands: false
       };
 
       const startTime = Date.now();
-      await mongoose.connect(config.database.uri, options);
+      await mongoose.connect(uri, options);
       const connectionTime = Date.now() - startTime;
       
       this.isConnected = true;
@@ -51,13 +45,9 @@ class DatabaseConnection {
       // Set up connection event listeners
       this.setupEventListeners();
       
-      // Skip user permission validation for now (causes infinite loop)
+      // Skip complex operations for now to prevent startup issues
       // await this.validateUserPermissions();
-      
-      // Create and validate indexes
-      await this.createAndValidateIndexes();
-      
-      // Skip connection pool test for now (can cause issues)
+      // await this.createAndValidateIndexes();
       // await this.runConnectionPoolTest();
       
       return true;
@@ -78,7 +68,7 @@ class DatabaseConnection {
         }, this.retryDelay);
       } else {
         logger.error('❌ Max retry attempts reached. MongoDB connection failed.');
-        process.exit(1);
+        throw new Error('MongoDB connection failed after max retries');
       }
       
       return false;
@@ -113,12 +103,10 @@ class DatabaseConnection {
     // Handle application termination
     process.on('SIGINT', async () => {
       await this.disconnect();
-      process.exit(0);
     });
 
     process.on('SIGTERM', async () => {
       await this.disconnect();
-      process.exit(0);
     });
   }
 
@@ -450,12 +438,14 @@ class DatabaseConnection {
   }
 
   async disconnect() {
-    try {
-      await mongoose.connection.close();
-      logger.info('✅ MongoDB connection closed');
-      this.isConnected = false;
-    } catch (error) {
-      logger.error({ error: error.message }, '❌ Error closing MongoDB connection');
+    if (mongoose.connection.readyState !== 0) {
+      try {
+        await mongoose.disconnect();
+        logger.info('✅ MongoDB connection closed');
+        this.isConnected = false;
+      } catch (error) {
+        logger.error({ error: error.message }, '❌ Error closing MongoDB connection');
+      }
     }
   }
 
@@ -473,55 +463,12 @@ class DatabaseConnection {
   }
 
   async healthCheck() {
-    try {
-      if (!this.isConnected) {
-        return {
-          status: 'disconnected',
-          message: 'Database not connected',
-          timestamp: new Date().toISOString()
-        };
-      }
-
-      // Ping the database
-      const startTime = Date.now();
-      await mongoose.connection.db.admin().ping();
-      const pingTime = Date.now() - startTime;
-      
-      // Get connection pool stats (simplified for compatibility)
-      let connectionPool = {};
-      try {
-        const poolStats = mongoose.connection.db.serverConfig?.s?.pool;
-        if (poolStats) {
-          connectionPool = {
-            size: poolStats.size || 0,
-            available: poolStats.available || 0,
-            used: poolStats.used || 0,
-            waiting: poolStats.waiting || 0
-          };
-        }
-      } catch (poolError) {
-        // Pool stats not available, use defaults
-        connectionPool = { size: 0, available: 0, used: 0, waiting: 0 };
-      }
-      
-      return {
-        status: 'healthy',
-        message: 'Database connection is healthy',
-        database: mongoose.connection.db.databaseName,
-        host: mongoose.connection.host,
-        pingTime: `${pingTime}ms`,
-        connectionPool,
-        indexesCreated: this.indexesCreated,
-        timestamp: new Date().toISOString()
-      };
-    } catch (error) {
-      return {
-        status: 'unhealthy',
-        message: 'Database health check failed',
-        error: error.message,
-        timestamp: new Date().toISOString()
-      };
-    }
+    const state = mongoose.connection.readyState; // 1=connected
+    return {
+      status: state === 1 ? 'healthy' : 'unhealthy',
+      dbName: mongoose.connection.name || null,
+      host: mongoose.connection.host || null
+    };
   }
 
   // Get index information for monitoring

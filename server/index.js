@@ -1,3 +1,11 @@
+// Crash guards at the very top
+process.on('unhandledRejection', err => {
+  console.error('[unhandledRejection]', err?.stack || err);
+});
+process.on('uncaughtException', err => {
+  console.error('[uncaughtException]', err?.stack || err);
+});
+
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
@@ -40,10 +48,8 @@ const databaseViewerRoutes = require('./routes/database-viewer');
 const shopifyRoutes = require('./routes/shopify');
 
 const app = express();
-
-/** ===== Render port binding (FIXED) ===== */
-const PORT = process.env.PORT || config.port || 3000;   // use Render's PORT first
-const HOST = '0.0.0.0';                                 // bind to all interfaces
+const PORT = process.env.PORT || 3000;   // prefer Render PORT
+const HOST = '0.0.0.0';
 
 /** Health for Render (root) */
 app.get('/health', (_req, res) => res.status(200).json({ ok: true }));
@@ -59,8 +65,8 @@ app.use(correlationIdMiddleware);
 app.use(...createSecurityMiddleware());
 app.use(compression());
 
-// CORS configuration (uses env-driven getCorsConfig)
-app.use(cors(getCorsConfig()));
+// TEMP permissive CORS for validation; TODO: restore strict getCorsConfig() after validation
+app.use(cors({ origin: true }));
 app.options('*', cors()); // allow preflights globally
 
 // HTTP request logging
@@ -76,8 +82,16 @@ app.use('/api/', rateLimits.general);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Database connection (make sure this does NOT process.exit on failure)
-dbConnection.connect();
+// Database connection wrapped to prevent crash on failure
+(async () => {
+  try {
+    await dbConnection.connect();
+    console.log('✅ Mongo connected');
+  } catch (e) {
+    console.error('⚠️ Mongo connect failed, continuing to serve:', e.message);
+    // DO NOT process.exit(1)
+  }
+})();
 
 /** API Health endpoints */
 app.get('/api/health', (req, res) => {
@@ -154,10 +168,10 @@ if (config.nodeEnv === 'production') {
   });
 }
 
-/** ===== Listen (FIXED) ===== */
 const server = app.listen(PORT, HOST, () => {
-  logStartup('sastabazar-api', '1.0.0', config.nodeEnv, PORT);
-  logger.info(`✅ Server listening on http://${HOST}:${PORT}`);
+  logStartup?.('sastabazar-api', '1.0.0', config?.nodeEnv, PORT);
+  logger?.info?.(`✅ Server listening on http://${HOST}:${PORT}`);
+  console.log(`✅ Server listening on http://${HOST}:${PORT}`);
 });
 
 /** Graceful shutdown */
