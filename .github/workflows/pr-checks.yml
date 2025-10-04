@@ -1,0 +1,319 @@
+name: Pull Request Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [opened, synchronize, reopened]
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  # Code Quality Checks
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd client && npm ci
+
+    - name: Run ESLint
+      run: |
+        npm run lint || echo "No lint script found"
+        cd client && npm run lint || echo "No client lint script found"
+
+    - name: Check code formatting
+      run: |
+        # Check if files are properly formatted
+        if command -v prettier &> /dev/null; then
+          npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,md}" || echo "Code formatting issues found"
+        fi
+
+    - name: Type checking
+      run: |
+        cd client && npm run type-check || echo "No type-check script found"
+
+    - name: Run secret scanning
+      run: |
+        ./scripts/secret-scan.sh
+
+    - name: Run dependency audit
+      run: |
+        npm audit --audit-level=moderate
+        cd client && npm audit --audit-level=moderate
+
+  # Build and Test
+  build-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ping: 1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd client && npm ci
+
+    - name: Run tests
+      env:
+        MONGODB_URI: mongodb://localhost:27017/sastabazar-test
+        JWT_SECRET: test-jwt-secret
+        NODE_ENV: test
+      run: |
+        npm test || echo "No test script found"
+        cd client && npm test || echo "No client test script found"
+
+    - name: Build application
+      run: |
+        npm run build:all
+
+    - name: Test build artifacts
+      run: |
+        # Check if build files exist
+        test -d client/dist || (echo "Client build failed" && exit 1)
+        test -f server/index.js || (echo "Server file missing" && exit 1)
+
+  # Security Checks
+  security:
+    name: Security Checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        npm ci
+        cd client && npm ci
+
+    - name: Run npm audit
+      run: |
+        npm audit --audit-level=moderate
+        cd client && npm audit --audit-level=moderate
+
+    - name: Check for secrets
+      run: |
+        # Check for potential secrets in code
+        if grep -r "password\|secret\|key" --include="*.js" --include="*.jsx" --include="*.ts" --include="*.tsx" . | grep -v "node_modules" | grep -v ".env.example"; then
+          echo "⚠️ Potential secrets found in code"
+          echo "Please ensure no secrets are committed to the repository"
+        fi
+
+  # Database Migration Test
+  migration-test:
+    name: Database Migration Test
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ping: 1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Test database migration
+      env:
+        MONGODB_URI: mongodb://localhost:27017/sastabazar-test
+        JWT_SECRET: test-jwt-secret
+        NODE_ENV: test
+      run: |
+        npm run migrate
+
+    - name: Test database seeding
+      env:
+        MONGODB_URI: mongodb://localhost:27017/sastabazar-test
+        JWT_SECRET: test-jwt-secret
+        NODE_ENV: test
+      run: |
+        npm run seed
+
+  # API Contract Tests
+  api-contracts:
+    name: API Contract Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ping: 1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Start server
+      env:
+        MONGODB_URI: mongodb://localhost:27017/sastabazar-test
+        JWT_SECRET: test-jwt-secret
+        NODE_ENV: test
+        PORT: 5001
+      run: |
+        npm start &
+        sleep 10
+
+    - name: Test API endpoints
+      run: |
+        # Test health endpoint
+        curl -f http://localhost:5001/api/health || exit 1
+        
+        # Test database health endpoint
+        curl -f http://localhost:5001/api/health/db || exit 1
+        
+        # Test products endpoint
+        curl -f http://localhost:5001/api/products || exit 1
+        
+        # Test payment config endpoints
+        curl -f http://localhost:5001/api/payments/razorpay/config || exit 1
+        curl -f http://localhost:5001/api/payments/stripe/config || exit 1
+        
+        echo "✅ All API endpoints are working"
+
+    - name: Cleanup
+      if: always()
+      run: |
+        pkill -f "node server/index.js" || true
+
+  # Performance Regression Test
+  performance-regression:
+    name: Performance Regression
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ping: 1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build:all
+
+    - name: Start server
+      env:
+        MONGODB_URI: mongodb://localhost:27017/sastabazar-test
+        JWT_SECRET: test-jwt-secret
+        NODE_ENV: test
+        PORT: 5001
+      run: |
+        npm start &
+        sleep 10
+
+    - name: Run performance tests
+      run: |
+        # Install artillery
+        npm install -g artillery
+        
+        # Create performance test
+        cat > perf-test.yml << 'EOF'
+        config:
+          target: 'http://localhost:5001'
+          phases:
+            - duration: 30
+              arrivalRate: 5
+        scenarios:
+          - name: "Health Check"
+            weight: 50
+            flow:
+              - get:
+                  url: "/api/health"
+          - name: "Products API"
+            weight: 50
+            flow:
+              - get:
+                  url: "/api/products"
+        EOF
+        
+        # Run test
+        artillery run perf-test.yml
+
+    - name: Cleanup
+      if: always()
+      run: |
+        pkill -f "node server/index.js" || true

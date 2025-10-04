@@ -1,0 +1,11 @@
+<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <!-- Shopping Cart - More refined version -->
+  <path d="M4 4h2l.5 2.5M8 14h10l3-6H6.5m0 0L8 14m0 0l-2.5 5M8 14l-2.5 5m0 0h10a1 1 0 001-1.2L17.5 14H8m0 0l-2.5 5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  
+  <!-- Cart Wheels - Larger and more prominent -->
+  <circle cx="9" cy="21" r="1.5" fill="currentColor"/>
+  <circle cx="21" cy="21" r="1.5" fill="currentColor"/>
+  
+  <!-- Rupee Symbol - Larger and more centered -->
+  <text x="12" y="15" font-family="system-ui, -apple-system, sans-serif" font-size="10" font-weight="bold" fill="currentColor" text-anchor="middle">₹</text>
+</svg> 
