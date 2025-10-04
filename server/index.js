@@ -1,15 +1,12 @@
 // Crash guards at the very top
-process.on('unhandledRejection', err => {
-  console.error('[unhandledRejection]', err?.stack || err);
-});
-process.on('uncaughtException', err => {
-  console.error('[uncaughtException]', err?.stack || err);
-});
+process.on('unhandledRejection', e => console.error('[unhandledRejection]', e?.stack || e));
+process.on('uncaughtException', e => console.error('[uncaughtException]', e?.stack || e));
 
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const path = require('path');
+const fs = require('fs');
 
 // Load configuration
 const { config, validateConfig, getCorsConfig } = require('./config');
@@ -85,11 +82,16 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Database connection wrapped to prevent crash on failure
 (async () => {
   try {
-    await dbConnection.connect();
-    console.log('✅ Mongo connected');
+    const skip = String(process.env.SKIP_DB).toLowerCase() === 'true';
+    console.log('[DEBUG] SKIP_DB=', process.env.SKIP_DB, ' MONGODB_URI host=', (process.env.MONGODB_URI || '').split('@')[1]?.split('/')[0]);
+
+    if (skip) {
+      console.log('⚠️ SKIP_DB=true → skipping Mongo connect on startup');
+    } else {
+      await dbConnection.connect();
+    }
   } catch (e) {
-    console.error('⚠️ Mongo connect failed, continuing to serve:', e.message);
-    // DO NOT process.exit(1)
+    console.error('⚠️ Mongo connect failed, continuing to serve:', e?.message || e);
   }
 })();
 
@@ -130,9 +132,14 @@ app.get('/api/health/db', async (req, res) => {
   }
 });
 
-// Serve static files from React app in production
+// Serve static files from React app in production (only if built files exist)
 if (config.nodeEnv === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/dist')));
+  const clientDist = path.join(__dirname, '../client/dist');
+  if (fs.existsSync(clientDist)) {
+    app.use(express.static(clientDist));
+  } else {
+    console.warn('⚠️ client/dist not found; skipping static file serving.');
+  }
 }
 
 // API Routes
@@ -156,11 +163,17 @@ app.use(errorHandler);
 // 404 handler for API routes
 app.use('/api/*', notFoundHandler);
 
-// Serve React app for all non-API routes in production
+// Serve React app for all non-API routes in production (only if built files exist)
 if (config.nodeEnv === 'production') {
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-  });
+  const clientDist = path.join(__dirname, '../client/dist');
+  if (fs.existsSync(clientDist)) {
+    app.get('*', (_req, res) => res.sendFile(path.join(clientDist, 'index.html')));
+  } else {
+    // 404 handler when client/dist doesn't exist
+    app.use('*', (req, res) => {
+      res.status(404).json({ error: 'Route not found' });
+    });
+  }
 } else {
   // 404 handler for development
   app.use('*', (req, res) => {
