@@ -6,10 +6,9 @@ const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const path = require('path');
-const fs = require('fs');
 
 // Load configuration
-const { config, validateConfig, getCorsConfig } = require('./config');
+const { config, validateConfig } = require('./config');
 const dbConnection = require('./config/database');
 const { rateLimits, createSecurityMiddleware } = require('./config/security');
 const {
@@ -62,9 +61,32 @@ app.use(correlationIdMiddleware);
 app.use(...createSecurityMiddleware());
 app.use(compression());
 
-// TEMP permissive CORS for validation; TODO: restore strict getCorsConfig() after validation
-app.use(cors({ origin: true }));
-app.options('*', cors()); // allow preflights globally
+// --- START: CORRECTED CORS CONFIGURATION ---
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'https://sastabazarecommerce.netlify.app',
+  'https://www.sastabazar.co.in',
+  'http://sastabazar.co.in'
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+// Note: You no longer need app.options('*', cors()) as the line above handles it.
+// --- END: CORRECTED CORS CONFIGURATION ---
+
 
 // HTTP request logging
 app.use(httpLogger);
@@ -79,19 +101,24 @@ app.use('/api/', rateLimits.general);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// Debug log before DB connect
+console.log('[DEBUG] SKIP_DB=', process.env.SKIP_DB, ' MONGODB_URI host=', (process.env.MONGODB_URI || '').split('@')[1]?.split('/')[0]);
+
 // Database connection wrapped to prevent crash on failure
 (async () => {
   try {
-    const skip = String(process.env.SKIP_DB).toLowerCase() === 'true';
-    console.log('[DEBUG] SKIP_DB=', process.env.SKIP_DB, ' MONGODB_URI host=', (process.env.MONGODB_URI || '').split('@')[1]?.split('/')[0]);
-
-    if (skip) {
+    if (String(process.env.SKIP_DB).toLowerCase() === 'true') {
       console.log('⚠️ SKIP_DB=true → skipping Mongo connect on startup');
     } else {
       await dbConnection.connect();
+      console.log('✅ Mongo connected');
     }
   } catch (e) {
-    console.error('⚠️ Mongo connect failed, continuing to serve:', e?.message || e);
+    // On a failed initial connection, log the error and shut down.
+    // This tells Render that the deploy failed and prevents the app
+    // from running in a broken state.
+    console.error('CRITICAL: Initial Mongo connect failed. Shutting down.', e?.message || e);
+    process.exit(1); 
   }
 })();
 
@@ -132,14 +159,9 @@ app.get('/api/health/db', async (req, res) => {
   }
 });
 
-// Serve static files from React app in production (only if built files exist)
+// Serve static files from React app in production
 if (config.nodeEnv === 'production') {
-  const clientDist = path.join(__dirname, '../client/dist');
-  if (fs.existsSync(clientDist)) {
-    app.use(express.static(clientDist));
-  } else {
-    console.warn('⚠️ client/dist not found; skipping static file serving.');
-  }
+  app.use(express.static(path.join(__dirname, '../client/dist')));
 }
 
 // API Routes
@@ -163,17 +185,11 @@ app.use(errorHandler);
 // 404 handler for API routes
 app.use('/api/*', notFoundHandler);
 
-// Serve React app for all non-API routes in production (only if built files exist)
+// Serve React app for all non-API routes in production
 if (config.nodeEnv === 'production') {
-  const clientDist = path.join(__dirname, '../client/dist');
-  if (fs.existsSync(clientDist)) {
-    app.get('*', (_req, res) => res.sendFile(path.join(clientDist, 'index.html')));
-  } else {
-    // 404 handler when client/dist doesn't exist
-    app.use('*', (req, res) => {
-      res.status(404).json({ error: 'Route not found' });
-    });
-  }
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  });
 } else {
   // 404 handler for development
   app.use('*', (req, res) => {
