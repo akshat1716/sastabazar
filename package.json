@@ -4,6 +4,7 @@
   "description": "A premium, AI-integrated e-commerce platform with minimalist design",
   "main": "server/index.js",
   "scripts": {
+    "lint": "eslint server/**/*.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "nodemon server/index.js",
     "client": "cd client && npm run dev",
