@@ -617,14 +617,16 @@ router.post('/webhooks/stripe', express.raw({type: 'application/json'}), async (
 
     // Handle the event
     switch (event.type) {
-      case 'checkout.session.completed':
+      case 'checkout.session.completed': {
         const session = event.data.object;
         await handleSuccessfulPayment(session);
         break;
-      case 'payment_intent.payment_failed':
+      }
+      case 'payment_intent.payment_failed': {
         const paymentIntent = event.data.object;
         await handleFailedPayment(paymentIntent);
         break;
+      }
       default:
         console.log(`Unhandled event type ${event.type}`);
     }

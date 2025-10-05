@@ -117,17 +117,19 @@ async function processChatMessage(message, conversationHistory, user) {
       ];
       break;
 
-    case 'product_search':
+    case 'product_search': {
       const searchResults = await searchProductsByKeywords(keywords, user);
       response.message = `I found ${searchResults.length} products that match your request. Here are some recommendations:`;
       response.products = searchResults.slice(0, 4);
       break;
+    }
 
-    case 'style_advice':
+    case 'style_advice': {
       response.message = "I'd be happy to help you with style recommendations! What aesthetic are you going for? (e.g., Modern, Industrial, Artisan, Minimalist, Luxury)";
       break;
+    }
 
-    case 'category_explore':
+    case 'category_explore': {
       const category = extractCategory(lowerMessage);
       if (category) {
         const categoryProducts = await Product.find({ 
@@ -138,10 +140,12 @@ async function processChatMessage(message, conversationHistory, user) {
         response.products = categoryProducts;
       }
       break;
+    }
 
-    case 'price_inquiry':
+    case 'price_inquiry': {
       response.message = "I can help you find products within your budget. What price range are you looking for?";
       break;
+    }
 
     default:
       response.message = "I understand you're looking for something. Could you tell me more about what you need? I can help with specific products, style advice, or category recommendations.";
