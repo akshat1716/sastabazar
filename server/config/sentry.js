@@ -1,7 +1,7 @@
-const Sentry = require('@sentry/node');
-const { Integrations } = require('@sentry/integrations');
-const { config } = require('./index');
-const { logger } = require('./logger');
+const Sentry = require("@sentry/node");
+const { Integrations } = require("@sentry/integrations");
+const { config } = require("./index");
+const { logger } = require("./logger");
 
 // Initialize Sentry if DSN is provided
 if (config.sentry.enabled) {
@@ -11,7 +11,7 @@ if (config.sentry.enabled) {
     integrations: [
       new Integrations.Http({ tracing: true }),
       new Integrations.Express({ app: undefined }),
-      new Integrations.Mongo({ useMongoose: true })
+      new Integrations.Mongo({ useMongoose: true }),
     ],
     tracesSampleRate: config.isDevelopment ? 1.0 : 0.1,
     beforeSend(event, hint) {
@@ -21,19 +21,19 @@ if (config.sentry.enabled) {
         if (event.request.headers) {
           delete event.request.headers.authorization;
           delete event.request.headers.cookie;
-          delete event.request.headers['x-api-key'];
+          delete event.request.headers["x-api-key"];
         }
-        
+
         // Remove sensitive query parameters
         if (event.request.query_string) {
           const queryParams = new URLSearchParams(event.request.query_string);
-          queryParams.delete('password');
-          queryParams.delete('token');
-          queryParams.delete('secret');
+          queryParams.delete("password");
+          queryParams.delete("token");
+          queryParams.delete("secret");
           event.request.query_string = queryParams.toString();
         }
       }
-      
+
       // Remove sensitive data from extra context
       if (event.extra) {
         delete event.extra.password;
@@ -41,35 +41,41 @@ if (config.sentry.enabled) {
         delete event.extra.secret;
         delete event.extra.authorization;
       }
-      
+
       return event;
     },
     beforeBreadcrumb(breadcrumb) {
       // Filter out sensitive breadcrumbs
-      if (breadcrumb.category === 'http' && breadcrumb.data) {
+      if (breadcrumb.category === "http" && breadcrumb.data) {
         delete breadcrumb.data.authorization;
         delete breadcrumb.data.cookie;
       }
-      
+
       return breadcrumb;
-    }
+    },
   });
-  
-  logger.info('Sentry initialized successfully');
+
+  logger.info("Sentry initialized successfully");
 } else {
-  logger.info('Sentry not configured - error tracking disabled');
+  logger.info("Sentry not configured - error tracking disabled");
 }
 
 // Sentry middleware for Express
 const sentryMiddleware = {
   // Request handler middleware
-  requestHandler: config.sentry.enabled ? Sentry.requestHandler() : (req, res, next) => next(),
-  
+  requestHandler: config.sentry.enabled
+    ? Sentry.requestHandler()
+    : (req, res, next) => next(),
+
   // Tracing handler middleware
-  tracingHandler: config.sentry.enabled ? Sentry.tracingHandler() : (req, res, next) => next(),
-  
+  tracingHandler: config.sentry.enabled
+    ? Sentry.tracingHandler()
+    : (req, res, next) => next(),
+
   // Error handler middleware
-  errorHandler: config.sentry.enabled ? Sentry.errorHandler() : (err, req, res, next) => next(err)
+  errorHandler: config.sentry.enabled
+    ? Sentry.errorHandler()
+    : (err, req, res, next) => next(err),
 };
 
 // Helper functions for manual error reporting
@@ -77,34 +83,34 @@ const captureException = (error, context = {}) => {
   if (config.sentry.enabled) {
     Sentry.withScope((scope) => {
       // Add context
-      Object.keys(context).forEach(key => {
+      Object.keys(context).forEach((key) => {
         scope.setTag(key, context[key]);
       });
-      
+
       // Capture the exception
       Sentry.captureException(error);
     });
   }
-  
+
   // Always log locally
-  logger.error({ error, context }, 'Exception captured');
+  logger.error({ error, context }, "Exception captured");
 };
 
-const captureMessage = (message, level = 'info', context = {}) => {
+const captureMessage = (message, level = "info", context = {}) => {
   if (config.sentry.enabled) {
     Sentry.withScope((scope) => {
       // Add context
-      Object.keys(context).forEach(key => {
+      Object.keys(context).forEach((key) => {
         scope.setTag(key, context[key]);
       });
-      
+
       // Capture the message
       Sentry.captureMessage(message, level);
     });
   }
-  
+
   // Always log locally
-  logger[level]({ message, context }, 'Message captured');
+  logger[level]({ message, context }, "Message captured");
 };
 
 const setUser = (user) => {
@@ -112,7 +118,7 @@ const setUser = (user) => {
     Sentry.setUser({
       id: user.id,
       email: user.email,
-      username: user.username
+      username: user.username,
     });
   }
 };
@@ -161,25 +167,25 @@ class SentryError extends Error {
 
 class DatabaseError extends SentryError {
   constructor(message, operation, context = {}) {
-    super(message, { component: 'database', operation }, context);
+    super(message, { component: "database", operation }, context);
   }
 }
 
 class PaymentError extends SentryError {
   constructor(message, gateway, context = {}) {
-    super(message, { component: 'payment', gateway }, context);
+    super(message, { component: "payment", gateway }, context);
   }
 }
 
 class AuthenticationError extends SentryError {
   constructor(message, context = {}) {
-    super(message, { component: 'auth' }, context);
+    super(message, { component: "auth" }, context);
   }
 }
 
 class ValidationError extends SentryError {
   constructor(message, field, context = {}) {
-    super(message, { component: 'validation', field }, context);
+    super(message, { component: "validation", field }, context);
   }
 }
 
@@ -190,47 +196,50 @@ const errorReportingMiddleware = (error, req, res, next) => {
     if (req.user) {
       setUser(req.user);
     }
-    
+
     // Set request context
-    setContext('request', {
+    setContext("request", {
       method: req.method,
       url: req.url,
       headers: {
-        'user-agent': req.get('User-Agent'),
-        'content-type': req.get('Content-Type')
+        "user-agent": req.get("User-Agent"),
+        "content-type": req.get("Content-Type"),
       },
       ip: req.ip,
-      correlationId: req.correlationId
+      correlationId: req.correlationId,
     });
-    
+
     // Capture the error
     captureException(error, {
       correlationId: req.correlationId,
       userId: req.user?.id,
       url: req.url,
-      method: req.method
+      method: req.method,
     });
   }
-  
+
   next(error);
 };
 
 // Performance monitoring middleware
 const performanceMiddleware = (req, res, next) => {
   if (config.sentry.enabled) {
-    const transaction = startTransaction(`${req.method} ${req.route?.path || req.path}`, 'http.server');
-    
+    const transaction = startTransaction(
+      `${req.method} ${req.route?.path || req.path}`,
+      "http.server",
+    );
+
     if (transaction) {
       req.sentryTransaction = transaction;
-      
-      res.on('finish', () => {
-        transaction.setStatus(res.statusCode >= 400 ? 'internal_error' : 'ok');
-        transaction.setData('http.status_code', res.statusCode);
+
+      res.on("finish", () => {
+        transaction.setStatus(res.statusCode >= 400 ? "internal_error" : "ok");
+        transaction.setData("http.status_code", res.statusCode);
         finishTransaction(transaction);
       });
     }
   }
-  
+
   next();
 };
 
@@ -250,6 +259,5 @@ module.exports = {
   DatabaseError,
   PaymentError,
   AuthenticationError,
-  ValidationError
+  ValidationError,
 };
-

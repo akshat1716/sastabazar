@@ -3,11 +3,13 @@
 ## 🎯 **Quick Setup Options**
 
 ### **Option 1: Coming Soon Page (5 minutes)**
+
 1. **Upload the coming-soon.html file** to your hosting provider
 2. **Point your domain** to the hosting server
 3. **Done!** Your domain will show a beautiful coming soon page
 
 ### **Option 2: Full Website Deployment (30 minutes)**
+
 1. **Deploy your full website** to a hosting provider
 2. **Configure domain DNS** to point to your server
 3. **Set up SSL certificate** for HTTPS
@@ -20,11 +22,13 @@
 ### **Step 1: Choose Your Hosting Provider**
 
 #### **Free Options:**
+
 - **Netlify** (Recommended for static sites)
 - **Vercel** (Great for React apps)
 - **GitHub Pages** (Free hosting)
 
 #### **Paid Options:**
+
 - **DigitalOcean** ($5/month droplet)
 - **AWS EC2** (Pay as you use)
 - **Google Cloud** (Free tier available)
@@ -33,12 +37,14 @@
 ### **Step 2: Deploy Your Website**
 
 #### **For Coming Soon Page (Netlify):**
+
 1. Go to [netlify.com](https://netlify.com)
 2. Sign up for free account
 3. Drag and drop `coming-soon.html` file
 4. Get your Netlify URL (e.g., `https://amazing-name-123456.netlify.app`)
 
 #### **For Full Website (DigitalOcean):**
+
 1. Create a DigitalOcean droplet ($5/month)
 2. Follow the deployment guide in `PRODUCTION_DEPLOYMENT_GUIDE.md`
 3. Run the deployment script: `./deploy.sh`
@@ -58,6 +64,7 @@
 3. **Update DNS Records**
 
 #### **For Coming Soon Page (Netlify):**
+
 ```
 Type: CNAME
 Name: www
@@ -71,6 +78,7 @@ TTL: 600
 ```
 
 #### **For Full Website (VPS/Server):**
+
 ```
 Type: A
 Name: @
@@ -86,10 +94,12 @@ TTL: 600
 ### **Step 4: Set Up SSL Certificate**
 
 #### **For Netlify:**
+
 - SSL is automatically enabled
 - Your site will be available at `https://yourdomain.com`
 
 #### **For VPS/Server:**
+
 1. Install Certbot: `sudo apt install certbot`
 2. Get SSL certificate: `sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com`
 3. SSL will be automatically renewed
@@ -101,6 +111,7 @@ TTL: 600
 ### **Option A: Netlify Deployment (Easiest)**
 
 1. **Prepare Files:**
+
    ```bash
    # Copy the coming soon page
    cp coming-soon.html index.html
@@ -120,6 +131,7 @@ TTL: 600
 ### **Option B: VPS Deployment (Full Website)**
 
 1. **Set Up VPS:**
+
    ```bash
    # Create a DigitalOcean droplet
    # Choose Ubuntu 20.04 LTS
@@ -127,38 +139,41 @@ TTL: 600
    ```
 
 2. **Connect to Server:**
+
    ```bash
    ssh root@YOUR_SERVER_IP
    ```
 
 3. **Install Dependencies:**
+
    ```bash
    # Update system
    apt update && apt upgrade -y
-   
+
    # Install Node.js
    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
    apt-get install -y nodejs
-   
+
    # Install PM2
    npm install -g pm2
-   
+
    # Install Nginx
    apt install nginx -y
    ```
 
 4. **Deploy Application:**
+
    ```bash
    # Clone your repository
    git clone https://github.com/your-username/sastabazar.git
    cd sastabazar
-   
+
    # Install dependencies
    npm install
-   
+
    # Build the application
    npm run build:all
-   
+
    # Start with PM2
    pm2 start ecosystem.config.js --env production
    pm2 save
@@ -166,17 +181,19 @@ TTL: 600
    ```
 
 5. **Configure Nginx:**
+
    ```bash
    # Create Nginx configuration
    nano /etc/nginx/sites-available/sastabazar
    ```
-   
+
    Add this configuration:
+
    ```nginx
    server {
        listen 80;
        server_name yourdomain.com www.yourdomain.com;
-       
+
        location / {
            proxy_pass http://localhost:5001;
            proxy_http_version 1.1;
@@ -190,7 +207,7 @@ TTL: 600
        }
    }
    ```
-   
+
    ```bash
    # Enable the site
    ln -s /etc/nginx/sites-available/sastabazar /etc/nginx/sites-enabled/
@@ -199,10 +216,11 @@ TTL: 600
    ```
 
 6. **Set Up SSL:**
+
    ```bash
    # Install Certbot
    apt install certbot python3-certbot-nginx -y
-   
+
    # Get SSL certificate
    certbot --nginx -d yourdomain.com -d www.yourdomain.com
    ```
@@ -243,6 +261,7 @@ CORS_ORIGIN=https://yourdomain.com
 ### **GoDaddy DNS Settings:**
 
 1. **A Record (Root Domain):**
+
    ```
    Type: A
    Name: @
@@ -251,6 +270,7 @@ CORS_ORIGIN=https://yourdomain.com
    ```
 
 2. **A Record (WWW):**
+
    ```
    Type: A
    Name: www
@@ -267,6 +287,7 @@ CORS_ORIGIN=https://yourdomain.com
    ```
 
 ### **DNS Propagation:**
+
 - DNS changes can take **5 minutes to 48 hours** to propagate
 - Use [whatsmydns.net](https://whatsmydns.net) to check propagation status
 - Clear your browser cache and try incognito mode
@@ -315,6 +336,7 @@ certbot renew --dry-run
 ## 🎉 **Launch Checklist**
 
 ### **Pre-Launch:**
+
 - [ ] Domain DNS configured
 - [ ] Website deployed and accessible
 - [ ] SSL certificate installed
@@ -324,6 +346,7 @@ certbot renew --dry-run
 - [ ] Environment variables set
 
 ### **Post-Launch:**
+
 - [ ] Monitor server performance
 - [ ] Set up backup procedures
 - [ ] Configure monitoring alerts

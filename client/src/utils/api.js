@@ -1,46 +1,46 @@
-import axios from 'axios'
+import axios from "axios";
 
 // Unified API base URL utility
 const getApiBaseUrl = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return `${process.env.VITE_SERVER_URL || 'https://your-domain.com'}/api`
+  if (process.env.NODE_ENV === "production") {
+    return `${process.env.VITE_SERVER_URL || "https://your-domain.com"}/api`;
   }
-  return 'http://localhost:5001/api'
-}
+  return "http://localhost:5001/api";
+};
 
 const api = axios.create({
   baseURL: getApiBaseUrl(),
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
-})
+});
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem("token");
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return config
+    return config;
   },
   (error) => {
-    return Promise.reject(error)
-  }
-)
+    return Promise.reject(error);
+  },
+);
 
 // Response interceptor to handle errors
 api.interceptors.response.use(
   (response) => {
-    return response.data
+    return response.data;
   },
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token')
-      window.location.href = '/login'
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
-    return Promise.reject(error)
-  }
-)
+    return Promise.reject(error);
+  },
+);
 
-export default api 
+export default api;

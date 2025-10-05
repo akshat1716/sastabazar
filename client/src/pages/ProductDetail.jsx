@@ -1,57 +1,59 @@
-import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { useLocalCart } from '../context/LocalCartContext'
-import { formatCurrency } from '../services/utils'
-import { Heart, Share2, ChevronLeft, ChevronRight, X } from 'lucide-react'
-import api from '../utils/api'
+import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useLocalCart } from "../context/LocalCartContext";
+import { formatCurrency } from "../services/utils";
+import { Heart, Share2, ChevronLeft, ChevronRight, X } from "lucide-react";
+import api from "../utils/api";
 
 const ProductDetail = () => {
-  const { id } = useParams()
-  const { addToCart } = useLocalCart()
-  const [product, setProduct] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [selectedVariant, setSelectedVariant] = useState(null)
-  const [quantity, setQuantity] = useState(1)
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0)
-  const [showImageModal, setShowImageModal] = useState(false)
+  const { id } = useParams();
+  const { addToCart } = useLocalCart();
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [selectedVariant, setSelectedVariant] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [showImageModal, setShowImageModal] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await api.get(`/products/${id}`)
+        const response = await api.get(`/products/${id}`);
         if (response.data && response.data.product) {
-          const productData = response.data.product
-          
+          const productData = response.data.product;
+
           // Use the product data directly from our database
-          setProduct(productData)
+          setProduct(productData);
           if (productData.variants && productData.variants.length > 0) {
-            setSelectedVariant(productData.variants[0])
+            setSelectedVariant(productData.variants[0]);
           }
         } else {
-          setProduct(null)
+          setProduct(null);
         }
       } catch (error) {
-        console.error('Error fetching product:', error)
-        setProduct(null)
+        console.error("Error fetching product:", error);
+        setProduct(null);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchProduct()
-  }, [id])
+    fetchProduct();
+  }, [id]);
 
   const handleAddToCart = () => {
-    addToCart(product, quantity, selectedVariant)
-  }
+    addToCart(product, quantity, selectedVariant);
+  };
 
   const nextImage = () => {
-    setSelectedImageIndex((prev) => (prev + 1) % product.images.length)
-  }
+    setSelectedImageIndex((prev) => (prev + 1) % product.images.length);
+  };
 
   const prevImage = () => {
-    setSelectedImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length)
-  }
+    setSelectedImageIndex(
+      (prev) => (prev - 1 + product.images.length) % product.images.length,
+    );
+  };
 
   if (loading) {
     return (
@@ -63,7 +65,10 @@ const ProductDetail = () => {
                 <div className="aspect-square bg-gray-200 rounded"></div>
                 <div className="grid grid-cols-4 gap-2">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className="aspect-square bg-gray-200 rounded"></div>
+                    <div
+                      key={i}
+                      className="aspect-square bg-gray-200 rounded"
+                    ></div>
                   ))}
                 </div>
               </div>
@@ -77,20 +82,25 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
-    )
+    );
   }
 
   if (!product) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-light text-gray-900 mb-4">Product not found</h1>
-          <Link to="/products" className="text-gray-500 hover:text-gray-900 transition-colors">
+          <h1 className="text-2xl font-light text-gray-900 mb-4">
+            Product not found
+          </h1>
+          <Link
+            to="/products"
+            className="text-gray-500 hover:text-gray-900 transition-colors"
+          >
             ← Back to Products
           </Link>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -99,7 +109,12 @@ const ProductDetail = () => {
       <div className="border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <Link to="/products" className="hover:text-gray-900 transition-colors">PRODUCTS</Link>
+            <Link
+              to="/products"
+              className="hover:text-gray-900 transition-colors"
+            >
+              PRODUCTS
+            </Link>
             <span>/</span>
             <span className="text-gray-900">{product.name.toUpperCase()}</span>
           </div>
@@ -113,12 +128,15 @@ const ProductDetail = () => {
             {/* Main Image */}
             <div className="relative aspect-square bg-gray-100 overflow-hidden group">
               <img
-                src={product.images[selectedImageIndex]?.url || 'https://via.placeholder.com/600x600?text=No+Image'}
+                src={
+                  product.images[selectedImageIndex]?.url ||
+                  "https://via.placeholder.com/600x600?text=No+Image"
+                }
                 alt={product.images[selectedImageIndex]?.alt || product.name}
                 className="w-full h-full object-cover cursor-pointer"
                 onClick={() => setShowImageModal(true)}
               />
-              
+
               {/* Navigation Arrows */}
               {product.images.length > 1 && (
                 <>
@@ -136,7 +154,7 @@ const ProductDetail = () => {
                   </button>
                 </>
               )}
-              
+
               {/* Image Counter */}
               {product.images.length > 1 && (
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
@@ -144,7 +162,7 @@ const ProductDetail = () => {
                 </div>
               )}
             </div>
-            
+
             {/* Thumbnail Gallery */}
             {product.images.length > 1 && (
               <div className="grid grid-cols-4 gap-2">
@@ -153,7 +171,9 @@ const ProductDetail = () => {
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
                     className={`aspect-square bg-gray-100 overflow-hidden border-2 transition-colors ${
-                      index === selectedImageIndex ? 'border-gray-900' : 'border-transparent hover:border-gray-300'
+                      index === selectedImageIndex
+                        ? "border-gray-900"
+                        : "border-transparent hover:border-gray-300"
                     }`}
                   >
                     <img
@@ -174,23 +194,38 @@ const ProductDetail = () => {
               <h1 className="text-2xl font-light text-gray-900 tracking-wide mb-2">
                 {product.name.toUpperCase()}
               </h1>
-              <p className="text-sm text-gray-500 uppercase tracking-wide">{product.brand}</p>
+              <p className="text-sm text-gray-500 uppercase tracking-wide">
+                {product.brand}
+              </p>
             </div>
 
             {/* Price */}
             <div>
               {product.isOnSale ? (
                 <div className="flex items-center space-x-3">
-                  <span className="text-2xl font-light text-gray-900">{formatCurrency(product.salePrice)}</span>
-                  <span className="text-lg text-gray-500 line-through">{formatCurrency(product.basePrice)}</span>
+                  <span className="text-2xl font-light text-gray-900">
+                    {formatCurrency(product.salePrice)}
+                  </span>
+                  <span className="text-lg text-gray-500 line-through">
+                    {formatCurrency(product.basePrice)}
+                  </span>
                   <span className="text-sm text-red-600 font-medium">
-                    {Math.round(((product.basePrice - product.salePrice) / product.basePrice) * 100)}% OFF
+                    {Math.round(
+                      ((product.basePrice - product.salePrice) /
+                        product.basePrice) *
+                        100,
+                    )}
+                    % OFF
                   </span>
                 </div>
               ) : (
-                <span className="text-2xl font-light text-gray-900">{formatCurrency(product.basePrice)}</span>
+                <span className="text-2xl font-light text-gray-900">
+                  {formatCurrency(product.basePrice)}
+                </span>
               )}
-              <p className="text-xs text-gray-500 mt-1">MRP INCL. OF ALL TAXES</p>
+              <p className="text-xs text-gray-500 mt-1">
+                MRP INCL. OF ALL TAXES
+              </p>
             </div>
 
             {/* Description */}
@@ -201,7 +236,9 @@ const ProductDetail = () => {
             {/* Variants */}
             {product.variants && product.variants.length > 1 && (
               <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-3">SELECT VARIANT</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-3">
+                  SELECT VARIANT
+                </h3>
                 <div className="space-y-2">
                   {product.variants.map((variant) => (
                     <button
@@ -209,13 +246,17 @@ const ProductDetail = () => {
                       onClick={() => setSelectedVariant(variant)}
                       className={`w-full text-left p-3 border transition-colors ${
                         selectedVariant?.id === variant.id
-                          ? 'border-gray-900 bg-gray-50'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? "border-gray-900 bg-gray-50"
+                          : "border-gray-200 hover:border-gray-300"
                       }`}
                     >
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">{variant.name}</span>
-                        <span className="text-sm text-gray-600">{formatCurrency(variant.price)}</span>
+                        <span className="text-sm font-medium">
+                          {variant.name}
+                        </span>
+                        <span className="text-sm text-gray-600">
+                          {formatCurrency(variant.price)}
+                        </span>
                       </div>
                     </button>
                   ))}
@@ -225,7 +266,9 @@ const ProductDetail = () => {
 
             {/* Quantity */}
             <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">QUANTITY</h3>
+              <h3 className="text-sm font-medium text-gray-900 mb-3">
+                QUANTITY
+              </h3>
               <div className="flex items-center space-x-3">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -233,7 +276,9 @@ const ProductDetail = () => {
                 >
                   -
                 </button>
-                <span className="text-sm font-medium w-8 text-center">{quantity}</span>
+                <span className="text-sm font-medium w-8 text-center">
+                  {quantity}
+                </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
                   className="w-8 h-8 border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
@@ -251,7 +296,7 @@ const ProductDetail = () => {
               >
                 ADD TO CART
               </button>
-              
+
               <div className="flex items-center space-x-4">
                 <button className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors">
                   <Heart size={16} />
@@ -267,16 +312,22 @@ const ProductDetail = () => {
             {/* Additional Info */}
             <div className="space-y-4 pt-6 border-t border-gray-100">
               <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-2">PRODUCT DETAILS</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">
+                  PRODUCT DETAILS
+                </h3>
                 <p className="text-sm text-gray-600">
-                  High-quality product from {product.brand}. Carefully crafted with attention to detail.
+                  High-quality product from {product.brand}. Carefully crafted
+                  with attention to detail.
                 </p>
               </div>
-              
+
               <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-2">SHIPPING & RETURNS</h3>
+                <h3 className="text-sm font-medium text-gray-900 mb-2">
+                  SHIPPING & RETURNS
+                </h3>
                 <p className="text-sm text-gray-600">
-                  Free shipping on orders over ₹999. Easy returns within 30 days.
+                  Free shipping on orders over ₹999. Easy returns within 30
+                  days.
                 </p>
               </div>
             </div>
@@ -294,14 +345,14 @@ const ProductDetail = () => {
             >
               <X size={24} />
             </button>
-            
+
             <div className="relative">
               <img
                 src={product.images[selectedImageIndex]?.url}
                 alt={product.images[selectedImageIndex]?.alt || product.name}
                 className="max-w-full max-h-[80vh] object-contain"
               />
-              
+
               {product.images.length > 1 && (
                 <>
                   <button
@@ -319,15 +370,17 @@ const ProductDetail = () => {
                 </>
               )}
             </div>
-            
+
             <div className="text-center mt-4 text-white">
-              <p className="text-sm">{selectedImageIndex + 1} / {product.images.length}</p>
+              <p className="text-sm">
+                {selectedImageIndex + 1} / {product.images.length}
+              </p>
             </div>
           </div>
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ProductDetail
+export default ProductDetail;

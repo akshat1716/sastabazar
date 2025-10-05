@@ -9,6 +9,7 @@ This document describes the Razorpay webhook integration for the Sastabazar e-co
 **URL:** `POST /api/payments/webhooks/razorpay`
 
 **Headers Required:**
+
 - `Content-Type: application/json`
 - `X-Razorpay-Signature: <signature>`
 
@@ -19,13 +20,15 @@ The webhook handler processes the following Razorpay events:
 ### 1. Payment Events
 
 #### `payment.authorized`
+
 - **Description:** Payment has been authorized but not captured
 - **Action:** Log the event, update order status to 'authorized'
 - **Idempotency:** Yes
 
 #### `payment.captured`
+
 - **Description:** Payment has been successfully captured
-- **Action:** 
+- **Action:**
   - Update order status to 'confirmed'
   - Set payment status to 'paid'
   - Clear user's cart
@@ -34,6 +37,7 @@ The webhook handler processes the following Razorpay events:
 - **Idempotency:** Yes
 
 #### `payment.failed`
+
 - **Description:** Payment has failed
 - **Action:**
   - Update order status to 'cancelled'
@@ -44,6 +48,7 @@ The webhook handler processes the following Razorpay events:
 ### 2. Order Events
 
 #### `order.paid`
+
 - **Description:** Order has been fully paid
 - **Action:**
   - Update order status to 'confirmed'
@@ -54,6 +59,7 @@ The webhook handler processes the following Razorpay events:
 ### 3. Refund Events
 
 #### `refund.created`
+
 - **Description:** Refund has been created
 - **Action:**
   - Update order status to 'refunded'
@@ -62,6 +68,7 @@ The webhook handler processes the following Razorpay events:
 - **Idempotency:** Yes
 
 #### `refund.processed`
+
 - **Description:** Refund has been processed
 - **Action:**
   - Update refund status
@@ -73,12 +80,12 @@ The webhook handler processes the following Razorpay events:
 ### Process
 
 1. **Extract Signature:** Get `X-Razorpay-Signature` header
-2. **Generate Expected Signature:** 
+2. **Generate Expected Signature:**
    ```javascript
    const expectedSignature = crypto
-     .createHmac('sha256', webhookSecret)
+     .createHmac("sha256", webhookSecret)
      .update(requestBody)
-     .digest('hex');
+     .digest("hex");
    ```
 3. **Compare Signatures:** Use constant-time comparison
 4. **Reject if Invalid:** Return 400 status with error message
@@ -223,10 +230,12 @@ curl -X POST https://your-domain.com/api/payments/webhooks/razorpay \
 #### 1. Signature Verification Fails
 
 **Symptoms:**
+
 - 400 Bad Request responses
 - "Invalid signature" errors
 
 **Solutions:**
+
 - Check webhook secret configuration
 - Verify signature generation algorithm
 - Ensure raw request body is used
@@ -234,10 +243,12 @@ curl -X POST https://your-domain.com/api/payments/webhooks/razorpay \
 #### 2. Webhook Not Received
 
 **Symptoms:**
+
 - No webhook events in logs
 - Orders stuck in pending state
 
 **Solutions:**
+
 - Check webhook URL configuration in Razorpay dashboard
 - Verify webhook endpoint is accessible
 - Check firewall and network configuration
@@ -245,10 +256,12 @@ curl -X POST https://your-domain.com/api/payments/webhooks/razorpay \
 #### 3. Duplicate Event Processing
 
 **Symptoms:**
+
 - Orders processed multiple times
 - Stock updated incorrectly
 
 **Solutions:**
+
 - Implement proper idempotency checking
 - Use event ID for duplicate detection
 - Add database constraints
@@ -256,10 +269,12 @@ curl -X POST https://your-domain.com/api/payments/webhooks/razorpay \
 #### 4. Slow Processing
 
 **Symptoms:**
+
 - Webhook timeouts
 - Razorpay retries
 
 **Solutions:**
+
 - Optimize database queries
 - Use background job processing
 - Implement caching
@@ -354,6 +369,3 @@ Content-Type: application/json
 This webhook integration provides a robust, secure, and scalable solution for processing Razorpay payment events. The implementation includes proper signature validation, idempotency handling, error management, and comprehensive monitoring.
 
 For questions or issues, refer to the troubleshooting section or contact the development team.
-
-
-

@@ -7,6 +7,7 @@ Your sastabazar e-commerce website now has a comprehensive CI/CD pipeline with G
 ## ✅ **What's Been Implemented**
 
 ### **1. GitHub Actions CI/CD Pipeline** 🔄
+
 - ✅ **Main CI/CD Workflow**: `.github/workflows/ci-cd.yml`
 - ✅ **Pull Request Checks**: `.github/workflows/pr-checks.yml`
 - ✅ **Environment Protection**: Staging and Production environments
@@ -15,6 +16,7 @@ Your sastabazar e-commerce website now has a comprehensive CI/CD pipeline with G
 - ✅ **Performance Testing**: Artillery performance tests
 
 ### **2. Deployment Automation** 🚀
+
 - ✅ **Staging Deployment**: Automatic deployment on `develop` branch
 - ✅ **Production Deployment**: Automatic deployment on `main` branch
 - ✅ **Manual Deployment**: Workflow dispatch for manual triggers
@@ -22,6 +24,7 @@ Your sastabazar e-commerce website now has a comprehensive CI/CD pipeline with G
 - ✅ **Health Checks**: Automated smoke tests after deployment
 
 ### **3. Environment Management** 🔐
+
 - ✅ **Environment Secrets**: Protected secrets for each environment
 - ✅ **Database Migration**: Automated migration on deployment
 - ✅ **Configuration Management**: Environment-specific configurations
@@ -32,6 +35,7 @@ Your sastabazar e-commerce website now has a comprehensive CI/CD pipeline with G
 ### **Main CI/CD Pipeline** (`ci-cd.yml`)
 
 #### **1. Install & Test Job**
+
 - **Triggers**: Push to `main`/`develop`, Pull Requests
 - **Services**: MongoDB 6.0
 - **Steps**:
@@ -44,6 +48,7 @@ Your sastabazar e-commerce website now has a comprehensive CI/CD pipeline with G
   - Upload build artifacts
 
 #### **2. Deploy to Staging**
+
 - **Triggers**: Push to `develop` branch
 - **Environment**: `staging` (protected)
 - **Steps**:
@@ -54,6 +59,7 @@ Your sastabazar e-commerce website now has a comprehensive CI/CD pipeline with G
   - Notify deployment status
 
 #### **3. Deploy to Production**
+
 - **Triggers**: Push to `main` branch
 - **Environment**: `production` (protected)
 - **Steps**:
@@ -64,6 +70,7 @@ Your sastabazar e-commerce website now has a comprehensive CI/CD pipeline with G
   - Notify deployment status
 
 #### **4. Security Scan**
+
 - **Triggers**: Pull Requests
 - **Steps**:
   - npm audit
@@ -71,6 +78,7 @@ Your sastabazar e-commerce website now has a comprehensive CI/CD pipeline with G
   - Secret detection
 
 #### **5. Performance Test**
+
 - **Triggers**: Push to `main` branch
 - **Steps**:
   - Start application
@@ -80,35 +88,42 @@ Your sastabazar e-commerce website now has a comprehensive CI/CD pipeline with G
 ### **Pull Request Checks** (`pr-checks.yml`)
 
 #### **1. Code Quality**
+
 - ESLint checks
 - Code formatting checks
 - TypeScript type checking
 
 #### **2. Build & Test**
+
 - Unit tests
 - Integration tests
 - Build verification
 
 #### **3. Security Checks**
+
 - npm audit
 - Secret detection
 - Security scanning
 
 #### **4. Database Migration Test**
+
 - Migration testing
 - Database seeding
 
 #### **5. API Contract Tests**
+
 - API endpoint testing
 - Contract validation
 
 #### **6. Performance Regression**
+
 - Performance testing
 - Regression detection
 
 ## 🔐 **Environment Secrets**
 
 ### **Required Secrets for Staging**
+
 ```bash
 # Database
 STAGING_MONGODB_URI=mongodb+srv://...
@@ -133,6 +148,7 @@ STAGING_URL=https://staging.sastabazar.com
 ```
 
 ### **Required Secrets for Production**
+
 ```bash
 # Database
 PRODUCTION_MONGODB_URI=mongodb+srv://...
@@ -161,6 +177,7 @@ PRODUCTION_URL=https://sastabazar.com
 ### **Automatic Deployment**
 
 #### **Staging Deployment**
+
 1. **Trigger**: Push to `develop` branch
 2. **Process**:
    - Run tests and build
@@ -170,6 +187,7 @@ PRODUCTION_URL=https://sastabazar.com
    - Notify success/failure
 
 #### **Production Deployment**
+
 1. **Trigger**: Push to `main` branch
 2. **Prerequisites**: Staging deployment must succeed
 3. **Process**:
@@ -182,6 +200,7 @@ PRODUCTION_URL=https://sastabazar.com
 ### **Manual Deployment**
 
 #### **Using GitHub Actions**
+
 1. Go to Actions tab in GitHub
 2. Select "CI/CD Pipeline"
 3. Click "Run workflow"
@@ -189,6 +208,7 @@ PRODUCTION_URL=https://sastabazar.com
 5. Click "Run workflow"
 
 #### **Using Deployment Script**
+
 ```bash
 # Deploy to staging
 ./scripts/deploy.sh staging
@@ -202,22 +222,26 @@ PRODUCTION_URL=https://sastabazar.com
 ### **Automated Tests**
 
 #### **Unit Tests**
+
 - Server-side unit tests
 - Client-side unit tests
 - Component tests
 
 #### **Integration Tests**
+
 - API endpoint tests
 - Database integration tests
 - Payment gateway tests
 
 #### **Smoke Tests**
+
 - Health endpoint checks
 - Database connectivity
 - Critical API endpoints
 - Payment configuration
 
 #### **Performance Tests**
+
 - Load testing with Artillery
 - Response time monitoring
 - Throughput testing
@@ -225,18 +249,21 @@ PRODUCTION_URL=https://sastabazar.com
 ### **Test Environments**
 
 #### **Pull Request Testing**
+
 - Code quality checks
 - Unit tests
 - Build verification
 - Security scanning
 
 #### **Staging Testing**
+
 - Full integration tests
 - Database migration tests
 - Smoke tests
 - Performance tests
 
 #### **Production Testing**
+
 - Smoke tests only
 - Health checks
 - Critical path testing
@@ -244,18 +271,21 @@ PRODUCTION_URL=https://sastabazar.com
 ## 🔒 **Security Features**
 
 ### **Secret Management**
+
 - ✅ **Environment Protection**: Secrets protected by GitHub environments
 - ✅ **Least Privilege**: Minimal required permissions
 - ✅ **Secret Rotation**: Support for secret rotation
 - ✅ **Audit Trail**: All secret access logged
 
 ### **Security Scanning**
+
 - ✅ **npm audit**: Dependency vulnerability scanning
 - ✅ **CodeQL**: Static code analysis
 - ✅ **Secret Detection**: Prevents secret commits
 - ✅ **Security Headers**: Helmet.js security headers
 
 ### **Access Control**
+
 - ✅ **Branch Protection**: Required reviews and checks
 - ✅ **Environment Gates**: Manual approval for production
 - ✅ **Deployment Permissions**: Restricted deployment access
@@ -263,6 +293,7 @@ PRODUCTION_URL=https://sastabazar.com
 ## 📊 **Monitoring & Observability**
 
 ### **Health Checks**
+
 ```bash
 # API Health
 GET /api/health
@@ -276,12 +307,14 @@ GET /api/payments/stripe/config
 ```
 
 ### **Logging**
+
 - ✅ **PM2 Logs**: Application logs
 - ✅ **GitHub Actions Logs**: CI/CD logs
 - ✅ **Deployment Logs**: Deployment history
 - ✅ **Error Tracking**: Error monitoring
 
 ### **Metrics**
+
 - ✅ **Performance Metrics**: Response times, throughput
 - ✅ **Deployment Metrics**: Success/failure rates
 - ✅ **Test Metrics**: Test coverage, pass rates
@@ -292,17 +325,20 @@ GET /api/payments/stripe/config
 ### **1. GitHub Repository Setup**
 
 #### **Enable GitHub Actions**
+
 1. Go to repository Settings
 2. Navigate to Actions → General
 3. Enable "Allow all actions and reusable workflows"
 
 #### **Create Environments**
+
 1. Go to Settings → Environments
 2. Create `staging` environment
 3. Create `production` environment
 4. Add protection rules (required reviewers)
 
 #### **Add Secrets**
+
 1. Go to Settings → Secrets and variables → Actions
 2. Add repository secrets for common values
 3. Add environment secrets for each environment
@@ -310,6 +346,7 @@ GET /api/payments/stripe/config
 ### **2. Server Setup**
 
 #### **Install Dependencies**
+
 ```bash
 # Install Node.js
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
@@ -323,6 +360,7 @@ sudo apt-get install -y mongodb
 ```
 
 #### **Setup SSH Access**
+
 ```bash
 # Generate SSH key pair
 ssh-keygen -t rsa -b 4096 -C "deploy@sastabazar"
@@ -335,6 +373,7 @@ cat ~/.ssh/id_rsa
 ```
 
 #### **Configure PM2**
+
 ```bash
 # Setup PM2 startup
 pm2 startup
@@ -346,6 +385,7 @@ pm2 save
 ### **3. Database Setup**
 
 #### **MongoDB Atlas**
+
 1. Create MongoDB Atlas cluster
 2. Create database user with least privileges
 3. Whitelist server IP addresses
@@ -353,6 +393,7 @@ pm2 save
 5. Add to GitHub secrets
 
 #### **Local MongoDB (Development)**
+
 ```bash
 # Start MongoDB
 sudo systemctl start mongod
@@ -367,6 +408,7 @@ use sastabazar
 ### **Common Issues**
 
 #### **Deployment Failures**
+
 ```bash
 # Check server logs
 ssh user@server "pm2 logs sastabazar-server"
@@ -379,6 +421,7 @@ ssh user@server "pm2 restart sastabazar-server"
 ```
 
 #### **Database Connection Issues**
+
 ```bash
 # Test database connection
 curl -f https://your-domain.com/api/health/db
@@ -388,6 +431,7 @@ ssh user@server "sudo journalctl -u mongod"
 ```
 
 #### **Payment Gateway Issues**
+
 ```bash
 # Test payment config
 curl -f https://your-domain.com/api/payments/razorpay/config
@@ -397,6 +441,7 @@ curl -f https://your-domain.com/api/payments/stripe/config
 ### **Debug Commands**
 
 #### **Local Testing**
+
 ```bash
 # Test locally
 npm run dev
@@ -413,6 +458,7 @@ npm run health:db
 ```
 
 #### **Server Debugging**
+
 ```bash
 # Check PM2 status
 pm2 status
@@ -430,6 +476,7 @@ pm2 restart sastabazar-server
 ## 📈 **Best Practices**
 
 ### **Development Workflow**
+
 1. **Create Feature Branch**: `git checkout -b feature/new-feature`
 2. **Make Changes**: Implement your changes
 3. **Run Tests Locally**: `npm test`
@@ -442,6 +489,7 @@ pm2 restart sastabazar-server
 10. **Deploy to Production**: Automatic production deployment
 
 ### **Code Quality**
+
 - ✅ **Write Tests**: Unit tests for new features
 - ✅ **Follow Linting**: Use ESLint and Prettier
 - ✅ **Document Changes**: Update documentation
@@ -449,6 +497,7 @@ pm2 restart sastabazar-server
 - ✅ **Performance Testing**: Test performance impact
 
 ### **Deployment Safety**
+
 - ✅ **Staging First**: Always test on staging first
 - ✅ **Rollback Plan**: Have rollback strategy ready
 - ✅ **Health Checks**: Monitor after deployment
@@ -468,4 +517,3 @@ Your sastabazar e-commerce website now has a complete CI/CD pipeline with:
 - ✅ **Rollback Support** and error handling
 
 The pipeline is production-ready and follows industry best practices! 🚀
-

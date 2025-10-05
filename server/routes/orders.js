@@ -1,14 +1,14 @@
-const express = require('express');
-const Order = require('../models/Order');
-const Cart = require('../models/Cart');
-const Product = require('../models/Product');
-const User = require('../models/User');
-const { auth } = require('../middleware/auth');
+const express = require("express");
+const Order = require("../models/Order");
+const Cart = require("../models/Cart");
+const Product = require("../models/Product");
+const User = require("../models/User");
+const { auth } = require("../middleware/auth");
 
 const router = express.Router();
 
 // Create new order
-router.post('/', auth, async (req, res) => {
+router.post("/", auth, async (req, res) => {
   try {
     const {
       items,
@@ -16,15 +16,16 @@ router.post('/', auth, async (req, res) => {
       billingAddress,
       paymentMethod,
       shippingMethod,
-      notes
+      notes,
     } = req.body;
 
     // Validate cart items
-    const cart = await Cart.findOne({ userId: req.user._id })
-      .populate('items.productId');
+    const cart = await Cart.findOne({ userId: req.user._id }).populate(
+      "items.productId",
+    );
 
     if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ error: 'Cart is empty.' });
+      return res.status(400).json({ error: "Cart is empty." });
     }
 
     // Calculate totals
@@ -34,14 +35,14 @@ router.post('/', auth, async (req, res) => {
     for (const cartItem of cart.items) {
       const product = cartItem.productId;
       if (!product || !product.isActive) {
-        return res.status(400).json({ 
-          error: `Product ${product?.name || 'Unknown'} is no longer available.` 
+        return res.status(400).json({
+          error: `Product ${product?.name || "Unknown"} is no longer available.`,
         });
       }
 
       if (product.stock < cartItem.quantity) {
-        return res.status(400).json({ 
-          error: `Insufficient stock for ${product.name}. Only ${product.stock} available.` 
+        return res.status(400).json({
+          error: `Insufficient stock for ${product.name}. Only ${product.stock} available.`,
         });
       }
 
@@ -55,7 +56,7 @@ router.post('/', auth, async (req, res) => {
         quantity: cartItem.quantity,
         price: price,
         selectedVariant: cartItem.selectedVariant,
-        image: product.getPrimaryImage()?.url || product.images[0]?.url
+        image: product.getPrimaryImage()?.url || product.images[0]?.url,
       });
     }
 
@@ -76,7 +77,7 @@ router.post('/', auth, async (req, res) => {
       billingAddress: billingAddress || shippingAddress,
       paymentMethod,
       shippingMethod,
-      notes
+      notes,
     });
 
     await order.save();
@@ -97,17 +98,17 @@ router.post('/', auth, async (req, res) => {
     await user.save();
 
     res.status(201).json({
-      message: 'Order created successfully.',
-      order
+      message: "Order created successfully.",
+      order,
     });
   } catch (error) {
-    console.error('Order creation error:', error);
-    res.status(500).json({ error: 'Failed to create order.' });
+    console.error("Order creation error:", error);
+    res.status(500).json({ error: "Failed to create order." });
   }
 });
 
 // Get user's orders
-router.get('/', auth, async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
     const { page = 1, limit = 10, status } = req.query;
 
@@ -128,61 +129,63 @@ router.get('/', auth, async (req, res) => {
       pagination: {
         currentPage: parseInt(page),
         totalPages: Math.ceil(total / parseInt(limit)),
-        totalOrders: total
-      }
+        totalOrders: total,
+      },
     });
   } catch (error) {
-    console.error('Orders fetch error:', error);
-    res.status(500).json({ error: 'Failed to fetch orders.' });
+    console.error("Orders fetch error:", error);
+    res.status(500).json({ error: "Failed to fetch orders." });
   }
 });
 
 // Get single order
-router.get('/:orderId', auth, async (req, res) => {
+router.get("/:orderId", auth, async (req, res) => {
   try {
     const { orderId } = req.params;
 
     const order = await Order.findOne({
       _id: orderId,
-      userId: req.user._id
-    }).populate('items.productId');
+      userId: req.user._id,
+    }).populate("items.productId");
 
     if (!order) {
-      return res.status(404).json({ error: 'Order not found.' });
+      return res.status(404).json({ error: "Order not found." });
     }
 
     res.json({ order });
   } catch (error) {
-    console.error('Order fetch error:', error);
-    res.status(500).json({ error: 'Failed to fetch order.' });
+    console.error("Order fetch error:", error);
+    res.status(500).json({ error: "Failed to fetch order." });
   }
 });
 
 // Cancel order
-router.put('/:orderId/cancel', auth, async (req, res) => {
+router.put("/:orderId/cancel", auth, async (req, res) => {
   try {
     const { orderId } = req.params;
     const { reason } = req.body;
 
     const order = await Order.findOne({
       _id: orderId,
-      userId: req.user._id
+      userId: req.user._id,
     });
 
     if (!order) {
-      return res.status(404).json({ error: 'Order not found.' });
+      return res.status(404).json({ error: "Order not found." });
     }
 
-    if (order.status === 'cancelled') {
-      return res.status(400).json({ error: 'Order is already cancelled.' });
+    if (order.status === "cancelled") {
+      return res.status(400).json({ error: "Order is already cancelled." });
     }
 
-    if (order.status === 'shipped' || order.status === 'delivered') {
-      return res.status(400).json({ error: 'Cannot cancel shipped or delivered orders.' });
+    if (order.status === "shipped" || order.status === "delivered") {
+      return res
+        .status(400)
+        .json({ error: "Cannot cancel shipped or delivered orders." });
     }
 
     // Update order status
-    order.status = 'cancelled';
+    order.status = "cancelled";
     order.cancelledAt = new Date();
     order.cancelledBy = req.user._id;
     order.cancellationReason = reason;
@@ -199,27 +202,27 @@ router.put('/:orderId/cancel', auth, async (req, res) => {
     }
 
     res.json({
-      message: 'Order cancelled successfully.',
-      order
+      message: "Order cancelled successfully.",
+      order,
     });
   } catch (error) {
-    console.error('Order cancellation error:', error);
-    res.status(500).json({ error: 'Failed to cancel order.' });
+    console.error("Order cancellation error:", error);
+    res.status(500).json({ error: "Failed to cancel order." });
   }
 });
 
 // Get order tracking
-router.get('/:orderId/tracking', auth, async (req, res) => {
+router.get("/:orderId/tracking", auth, async (req, res) => {
   try {
     const { orderId } = req.params;
 
     const order = await Order.findOne({
       _id: orderId,
-      userId: req.user._id
+      userId: req.user._id,
     });
 
     if (!order) {
-      return res.status(404).json({ error: 'Order not found.' });
+      return res.status(404).json({ error: "Order not found." });
     }
 
     const tracking = {
@@ -230,13 +233,13 @@ router.get('/:orderId/tracking', auth, async (req, res) => {
       estimatedDelivery: order.estimatedDelivery,
       shippingAddress: order.shippingAddress,
       items: order.items.length,
-      total: order.total
+      total: order.total,
     };
 
     res.json({ tracking });
   } catch (error) {
-    console.error('Order tracking error:', error);
-    res.status(500).json({ error: 'Failed to fetch order tracking.' });
+    console.error("Order tracking error:", error);
+    res.status(500).json({ error: "Failed to fetch order tracking." });
   }
 });
 
@@ -246,7 +249,7 @@ function calculateShipping(method, subtotal) {
   const shippingRates = {
     standard: subtotal > 100 ? 0 : 10,
     express: subtotal > 150 ? 15 : 25,
-    overnight: 35
+    overnight: 35,
   };
   return shippingRates[method] || 10;
 }
@@ -254,14 +257,14 @@ function calculateShipping(method, subtotal) {
 function calculateTax(subtotal, state) {
   // Simplified tax calculation
   const taxRates = {
-    'CA': 0.085,
-    'NY': 0.08,
-    'TX': 0.0625,
-    'FL': 0.06
+    CA: 0.085,
+    NY: 0.08,
+    TX: 0.0625,
+    FL: 0.06,
   };
-  
+
   const rate = taxRates[state] || 0.07;
   return Math.round(subtotal * rate * 100) / 100;
 }
 
-module.exports = router; 
+module.exports = router;

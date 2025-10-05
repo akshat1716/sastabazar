@@ -9,6 +9,7 @@
 ### Files Added/Modified
 
 #### 1. Environment Configuration
+
 - **Modified**: `server/config/index.js`
   - Added `RAZORPAY_WEBHOOK_SECRET` validation
   - Enhanced payment configuration with webhook secret support
@@ -24,6 +25,7 @@
   - Production-specific security settings
 
 #### 2. Payment System Implementation
+
 - **Created**: `server/routes/webhooks.js`
   - Dedicated Razorpay webhook handler
   - HMAC signature verification
@@ -40,6 +42,7 @@
   - Proper middleware ordering
 
 #### 3. Testing and Verification
+
 - **Created**: `smoke-tests.js`
   - Comprehensive smoke test suite
   - Health endpoint verification
@@ -59,6 +62,7 @@
   - Security and CORS for payment endpoints
 
 #### 4. Deployment Infrastructure
+
 - **Created**: `deploy.sh`
   - Complete production deployment script
   - Environment validation
@@ -71,56 +75,77 @@
 ## Key Code Blocks
 
 ### 1. Razorpay Webhook Handler
+
 ```javascript
 // POST /webhooks/razorpay - Razorpay webhook handler
-router.post('/razorpay', express.raw({type: 'application/json'}), asyncHandler(async (req, res) => {
-  try {
-    const sig = req.headers['x-razorpay-signature'];
-    const webhookSecret = config.payments.razorpay.webhookSecret || config.payments.razorpay.keySecret;
+router.post(
+  "/razorpay",
+  express.raw({ type: "application/json" }),
+  asyncHandler(async (req, res) => {
+    try {
+      const sig = req.headers["x-razorpay-signature"];
+      const webhookSecret =
+        config.payments.razorpay.webhookSecret ||
+        config.payments.razorpay.keySecret;
 
-    // Verify webhook signature
-    const expectedSignature = crypto
-      .createHmac('sha256', webhookSecret)
-      .update(req.body)
-      .digest('hex');
+      // Verify webhook signature
+      const expectedSignature = crypto
+        .createHmac("sha256", webhookSecret)
+        .update(req.body)
+        .digest("hex");
 
-    if (sig !== expectedSignature) {
-      logger.warn('Razorpay webhook signature verification failed');
-      return res.status(400).json({ error: 'Invalid signature' });
+      if (sig !== expectedSignature) {
+        logger.warn("Razorpay webhook signature verification failed");
+        return res.status(400).json({ error: "Invalid signature" });
+      }
+
+      const event = JSON.parse(req.body);
+
+      // Handle the event
+      switch (event.event) {
+        case "payment.captured":
+          await handleRazorpayPaymentCaptured(
+            event.payload.payment.entity,
+            req.correlationId,
+          );
+          break;
+        case "payment.failed":
+          await handleRazorpayPaymentFailed(
+            event.payload.payment.entity,
+            req.correlationId,
+          );
+          break;
+        // ... other event handlers
+      }
+
+      res.json({ received: true });
+    } catch (error) {
+      logError(error, {
+        operation: "razorpay_webhook",
+        correlationId: req.correlationId,
+      });
+      res.status(500).json({ error: "Webhook handler failed" });
     }
-
-    const event = JSON.parse(req.body);
-    
-    // Handle the event
-    switch (event.event) {
-      case 'payment.captured':
-        await handleRazorpayPaymentCaptured(event.payload.payment.entity, req.correlationId);
-        break;
-      case 'payment.failed':
-        await handleRazorpayPaymentFailed(event.payload.payment.entity, req.correlationId);
-        break;
-      // ... other event handlers
-    }
-
-    res.json({ received: true });
-  } catch (error) {
-    logError(error, { operation: 'razorpay_webhook', correlationId: req.correlationId });
-    res.status(500).json({ error: 'Webhook handler failed' });
-  }
-}));
+  }),
+);
 ```
 
 ### 2. Environment Validation
+
 ```javascript
 // Environment validation schema
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.string().transform(Number).default('5000'),
-  CLIENT_URL: z.string().url().default('http://localhost:5173'),
-  SERVER_URL: z.string().url().default('http://localhost:5000'),
-  CORS_ORIGIN: z.string().default('http://localhost:5173'),
-  MONGODB_URI: z.string().min(1, 'MongoDB URI is required'),
-  JWT_SECRET: z.string().min(32, 'JWT secret must be at least 32 characters long'),
+  NODE_ENV: z
+    .enum(["development", "production", "test"])
+    .default("development"),
+  PORT: z.string().transform(Number).default("5000"),
+  CLIENT_URL: z.string().url().default("http://localhost:5173"),
+  SERVER_URL: z.string().url().default("http://localhost:5000"),
+  CORS_ORIGIN: z.string().default("http://localhost:5173"),
+  MONGODB_URI: z.string().min(1, "MongoDB URI is required"),
+  JWT_SECRET: z
+    .string()
+    .min(32, "JWT secret must be at least 32 characters long"),
   RAZORPAY_KEY_ID: z.string().optional(),
   RAZORPAY_KEY_SECRET: z.string().optional(),
   RAZORPAY_WEBHOOK_SECRET: z.string().optional(),
@@ -129,57 +154,73 @@ const envSchema = z.object({
 ```
 
 ### 3. CORS Configuration
+
 ```javascript
 // CORS configuration helper
 const getCorsConfig = () => {
   const origins = [config.urls.corsOrigin];
-  
+
   if (config.isDevelopment) {
-    origins.push('http://localhost:3000', 'http://localhost:5173', 'http://localhost:5174');
+    origins.push(
+      "http://localhost:3000",
+      "http://localhost:5173",
+      "http://localhost:5174",
+    );
   }
-  
+
   return {
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
-      
+
       if (origins.includes(origin)) {
         callback(null, true);
       } else {
-        logger.warn({ blockedOrigin: origin }, 'CORS: Blocked request from unauthorized origin');
-        callback(new Error('Not allowed by CORS'));
+        logger.warn(
+          { blockedOrigin: origin },
+          "CORS: Blocked request from unauthorized origin",
+        );
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: false,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'X-Correlation-ID']
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+      "X-Correlation-ID",
+    ],
   };
 };
 ```
 
 ### 4. Health Endpoints
+
 ```javascript
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get("/api/health", (req, res) => {
   const healthData = {
-    status: 'OK',
-    message: 'API is running',
-    service: 'sastabazar',
+    status: "OK",
+    message: "API is running",
+    service: "sastabazar",
     timestamp: new Date().toISOString(),
-    correlationId: req.correlationId
+    correlationId: req.correlationId,
   };
   res.json(healthData);
 });
 
 // Database health check endpoint
-app.get('/api/health/db', async (req, res) => {
+app.get("/api/health/db", async (req, res) => {
   try {
     const healthStatus = await dbConnection.healthCheck();
     res.json(healthStatus);
   } catch (error) {
     res.status(500).json({
-      status: 'error',
-      message: 'Database health check failed',
-      error: error.message
+      status: "error",
+      message: "Database health check failed",
+      error: error.message,
     });
   }
 });
@@ -188,6 +229,7 @@ app.get('/api/health/db', async (req, res) => {
 ## Command Sequence
 
 ### Development Setup
+
 ```bash
 # 1. Install dependencies
 npm install
@@ -202,6 +244,7 @@ npm run dev
 ```
 
 ### Production Deployment
+
 ```bash
 # 1. Configure production environment
 cp env.production.template .env
@@ -216,6 +259,7 @@ cp env.production.template .env
 ```
 
 ### Testing Commands
+
 ```bash
 # Run smoke tests
 node smoke-tests.js
@@ -230,8 +274,9 @@ npm run test:all
 ## Verification Report
 
 ### ✅ Environment and CORS
+
 - **Status**: PASSED
-- **Details**: 
+- **Details**:
   - Environment validation with Zod schema implemented
   - CORS locked to CORS_ORIGIN only (plus localhost in dev)
   - No wildcards allowed
@@ -239,6 +284,7 @@ npm run test:all
   - JWT secret validation (minimum 32 characters)
 
 ### ✅ Database (Atlas)
+
 - **Status**: PASSED
 - **Details**:
   - MongoDB Atlas URI configured
@@ -249,6 +295,7 @@ npm run test:all
   - Retry logic with exponential backoff
 
 ### ✅ Payments (Razorpay)
+
 - **Status**: PASSED
 - **Details**:
   - POST `/payments/razorpay/order` creates Razorpay order
@@ -264,6 +311,7 @@ npm run test:all
   - Responds 2xx within timeout
 
 ### ✅ Logging and Health
+
 - **Status**: PASSED
 - **Details**:
   - Structured logging with Pino
@@ -274,6 +322,7 @@ npm run test:all
   - Error tracking with Sentry integration
 
 ### ✅ Security (Helmet)
+
 - **Status**: PASSED
 - **Details**:
   - Helmet enabled with sane defaults
@@ -283,6 +332,7 @@ npm run test:all
   - CORS properly configured
 
 ### ✅ Smoke Tests
+
 - **Status**: PASSED
 - **Details**:
   - Health endpoint responds 200
@@ -299,6 +349,7 @@ npm run test:all
 ## Required Environment Variables
 
 ### Production Required
+
 ```bash
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/sastabazar?retryWrites=true&w=majority
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-minimum-32-characters-long
@@ -313,6 +364,7 @@ RAZORPAY_WEBHOOK_SECRET=your_razorpay_webhook_secret
 ```
 
 ### Development Optional
+
 ```bash
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
 STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
@@ -323,6 +375,7 @@ SENTRY_DSN=your_sentry_dsn_here
 ## Manual Flow Verification
 
 ### User Journey Test
+
 1. ✅ Create user account
 2. ✅ Login with credentials
 3. ✅ Browse product catalog
@@ -334,6 +387,7 @@ SENTRY_DSN=your_sentry_dsn_here
 9. ✅ Confirm webhook updates are idempotent
 
 ### Payment Verification Test
+
 1. ✅ Order created with Razorpay order_id
 2. ✅ Server HMAC verification passes
 3. ✅ Order state becomes 'paid'
@@ -347,18 +401,21 @@ SENTRY_DSN=your_sentry_dsn_here
 ## Security Verification
 
 ### ✅ Secrets Management
+
 - No secrets committed to repository
 - .gitignore properly configured
 - Environment variables properly validated
 - Sensitive data sanitized in logs
 
 ### ✅ Network Security
+
 - CORS properly configured
 - Rate limiting implemented
 - Security headers present
 - HTTPS enforced in production
 
 ### ✅ Payment Security
+
 - Razorpay key_secret never exposed client-side
 - Webhook signature verification implemented
 - HMAC SHA256 for payment verification
@@ -367,12 +424,14 @@ SENTRY_DSN=your_sentry_dsn_here
 ## Performance Verification
 
 ### ✅ Database Performance
+
 - Connection pooling optimized
 - Critical indexes created
 - Query optimization implemented
 - Health monitoring available
 
 ### ✅ Application Performance
+
 - Structured logging with correlation IDs
 - Error handling with proper status codes
 - Rate limiting to prevent abuse
@@ -381,12 +440,14 @@ SENTRY_DSN=your_sentry_dsn_here
 ## Monitoring and Observability
 
 ### ✅ Health Monitoring
+
 - `/api/health` - Application health
 - `/api/health/db` - Database health
 - Structured logging with correlation IDs
 - Error tracking with Sentry
 
 ### ✅ Payment Monitoring
+
 - Payment event logging
 - Webhook event tracking
 - Order state monitoring
@@ -395,6 +456,7 @@ SENTRY_DSN=your_sentry_dsn_here
 ## Deployment Readiness
 
 ### ✅ Production Checklist
+
 - [x] Environment variables configured
 - [x] Database connection established
 - [x] Payment gateway integrated
@@ -430,6 +492,3 @@ The Sastabazar e-commerce application is **PRODUCTION READY** with all critical 
 - ✅ Production deployment scripts
 
 The application can be safely deployed to production following the provided command sequence and verification steps.
-
-
-

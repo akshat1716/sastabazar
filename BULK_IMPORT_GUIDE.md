@@ -5,6 +5,7 @@
 ### 🎯 Quick Start (3 Steps):
 
 1. **Get the template:**
+
    ```bash
    node bulk-import.js template
    ```
@@ -21,29 +22,31 @@
 
 ### 📋 CSV Template Columns:
 
-| Column | Description | Example | Required |
-|--------|-------------|---------|----------|
-| `name` | Product name | "Premium Cotton T-Shirt" | ✅ |
-| `description` | Full description | "Ultra-soft premium cotton..." | ✅ |
-| `shortDescription` | Brief description | "Premium cotton t-shirt" | ✅ |
-| `category` | Product category | "apparel" | ✅ |
-| `brand` | Brand name | "sastabazar" | ✅ |
-| `basePrice` | Regular price | "1299" | ✅ |
-| `salePrice` | Sale price | "999" | ❌ |
-| `stock` | Available quantity | "50" | ✅ |
-| `imageUrl` | Product image URL | "https://images.unsplash.com/..." | ✅ |
-| `tags` | Search tags | "cotton,premium,minimalist" | ❌ |
-| `isOnSale` | On sale? | "true" or "false" | ❌ |
-| `isFeatured` | Featured product? | "true" or "false" | ❌ |
-| `isNewArrival` | New arrival? | "true" or "false" | ❌ |
+| Column             | Description        | Example                           | Required |
+| ------------------ | ------------------ | --------------------------------- | -------- |
+| `name`             | Product name       | "Premium Cotton T-Shirt"          | ✅       |
+| `description`      | Full description   | "Ultra-soft premium cotton..."    | ✅       |
+| `shortDescription` | Brief description  | "Premium cotton t-shirt"          | ✅       |
+| `category`         | Product category   | "apparel"                         | ✅       |
+| `brand`            | Brand name         | "sastabazar"                      | ✅       |
+| `basePrice`        | Regular price      | "1299"                            | ✅       |
+| `salePrice`        | Sale price         | "999"                             | ❌       |
+| `stock`            | Available quantity | "50"                              | ✅       |
+| `imageUrl`         | Product image URL  | "https://images.unsplash.com/..." | ✅       |
+| `tags`             | Search tags        | "cotton,premium,minimalist"       | ❌       |
+| `isOnSale`         | On sale?           | "true" or "false"                 | ❌       |
+| `isFeatured`       | Featured product?  | "true" or "false"                 | ❌       |
+| `isNewArrival`     | New arrival?       | "true" or "false"                 | ❌       |
 
 ### 🏷️ Valid Categories:
+
 - `apparel` - Clothing, shoes, accessories
-- `home-goods` - Furniture, decor, kitchen items  
+- `home-goods` - Furniture, decor, kitchen items
 - `tech-accessories` - Electronics, gadgets
 - `art-prints` - Artwork, prints, decorative items
 
 ### 📝 Example Product Row:
+
 ```csv
 name,description,shortDescription,category,brand,basePrice,salePrice,stock,imageUrl,tags,isOnSale,isFeatured,isNewArrival
 "Premium Cotton T-Shirt","Ultra-soft premium cotton t-shirt with minimalist design. Perfect for everyday wear.","Premium cotton t-shirt","apparel","sastabazar","1299","999","50","https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop","cotton,premium,minimalist","true","true","false"
@@ -96,6 +99,7 @@ node bulk-import.js
 ### 🎉 Success!
 
 Once imported, your products will be:
+
 - ✅ Live on your website
 - ✅ Searchable and filterable
 - ✅ Ready for customers to purchase

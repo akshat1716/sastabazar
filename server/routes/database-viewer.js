@@ -1,15 +1,15 @@
-const express = require('express');
-const Product = require('../models/Product');
-const User = require('../models/User');
-const Order = require('../models/Order');
-const Cart = require('../models/Cart');
-const Wishlist = require('../models/Wishlist');
-const Review = require('../models/Review');
+const express = require("express");
+const Product = require("../models/Product");
+const User = require("../models/User");
+const Order = require("../models/Order");
+const Cart = require("../models/Cart");
+const Wishlist = require("../models/Wishlist");
+const Review = require("../models/Review");
 
 const router = express.Router();
 
 // Database viewer homepage
-router.get('/', (req, res) => {
+router.get("/", (req, res) => {
   const html = `
     <!DOCTYPE html>
     <html>
@@ -93,20 +93,20 @@ router.get('/', (req, res) => {
     </body>
     </html>
   `;
-  
+
   res.send(html);
 });
 
 // Get database statistics
-router.get('/stats', async (req, res) => {
+router.get("/stats", async (req, res) => {
   try {
     const stats = {
-      'Products': await Product.countDocuments(),
-      'Users': await User.countDocuments(),
-      'Orders': await Order.countDocuments(),
-      'Carts': await Cart.countDocuments(),
-      'Wishlists': await Wishlist.countDocuments(),
-      'Reviews': await Review.countDocuments()
+      Products: await Product.countDocuments(),
+      Users: await User.countDocuments(),
+      Orders: await Order.countDocuments(),
+      Carts: await Cart.countDocuments(),
+      Wishlists: await Wishlist.countDocuments(),
+      Reviews: await Review.countDocuments(),
     };
     res.json(stats);
   } catch (error) {
@@ -115,15 +115,18 @@ router.get('/stats', async (req, res) => {
 });
 
 // Get overview of all collections
-router.get('/overview', async (req, res) => {
+router.get("/overview", async (req, res) => {
   try {
     const overview = {
-      'Products': await Product.find().limit(5).lean(),
-      'Users': await User.find().select('name email role createdAt').limit(5).lean(),
-      'Orders': await Order.find().limit(5).lean(),
-      'Carts': await Cart.find().limit(5).lean(),
-      'Wishlists': await Wishlist.find().limit(5).lean(),
-      'Reviews': await Review.find().limit(5).lean()
+      Products: await Product.find().limit(5).lean(),
+      Users: await User.find()
+        .select("name email role createdAt")
+        .limit(5)
+        .lean(),
+      Orders: await Order.find().limit(5).lean(),
+      Carts: await Cart.find().limit(5).lean(),
+      Wishlists: await Wishlist.find().limit(5).lean(),
+      Reviews: await Review.find().limit(5).lean(),
     };
     res.json(overview);
   } catch (error) {
@@ -132,7 +135,7 @@ router.get('/overview', async (req, res) => {
 });
 
 // Get products
-router.get('/products', async (req, res) => {
+router.get("/products", async (req, res) => {
   try {
     const products = await Product.find().lean();
     res.json(products);
@@ -142,9 +145,9 @@ router.get('/products', async (req, res) => {
 });
 
 // Get users
-router.get('/users', async (req, res) => {
+router.get("/users", async (req, res) => {
   try {
-    const users = await User.find().select('-password').lean();
+    const users = await User.find().select("-password").lean();
     res.json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -152,7 +155,7 @@ router.get('/users', async (req, res) => {
 });
 
 // Get orders
-router.get('/orders', async (req, res) => {
+router.get("/orders", async (req, res) => {
   try {
     const orders = await Order.find().lean();
     res.json(orders);
@@ -162,7 +165,7 @@ router.get('/orders', async (req, res) => {
 });
 
 // Get carts
-router.get('/carts', async (req, res) => {
+router.get("/carts", async (req, res) => {
   try {
     const carts = await Cart.find().lean();
     res.json(carts);
@@ -172,7 +175,7 @@ router.get('/carts', async (req, res) => {
 });
 
 // Get wishlists
-router.get('/wishlists', async (req, res) => {
+router.get("/wishlists", async (req, res) => {
   try {
     const wishlists = await Wishlist.find().lean();
     res.json(wishlists);
@@ -182,7 +185,7 @@ router.get('/wishlists', async (req, res) => {
 });
 
 // Get reviews
-router.get('/reviews', async (req, res) => {
+router.get("/reviews", async (req, res) => {
   try {
     const reviews = await Review.find().lean();
     res.json(reviews);
@@ -191,4 +194,4 @@ router.get('/reviews', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

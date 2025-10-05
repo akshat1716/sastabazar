@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { CheckCircle, XCircle, ArrowRight } from 'lucide-react';
-import api from '../utils/api';
+import React, { useEffect, useState } from "react";
+import { useSearchParams, Link } from "react-router-dom";
+import { CheckCircle, XCircle, ArrowRight } from "lucide-react";
+import api from "../utils/api";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
@@ -9,48 +9,48 @@ const PaymentSuccess = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const orderId = searchParams.get('order_id');
-  const sessionId = searchParams.get('session_id');
+  const orderId = searchParams.get("order_id");
+  const sessionId = searchParams.get("session_id");
 
   useEffect(() => {
     const fetchOrder = async () => {
       try {
         if (orderId) {
           // Check if it's a demo order
-          if (orderId.startsWith('DEMO_')) {
+          if (orderId.startsWith("DEMO_")) {
             // Create a demo order object
             const demoOrder = {
               orderNumber: orderId,
               createdAt: new Date().toISOString(),
-              paymentMethod: 'Demo Payment',
-              status: 'confirmed',
+              paymentMethod: "Demo Payment",
+              status: "confirmed",
               items: [
                 {
-                  name: 'Demo Product',
+                  name: "Demo Product",
                   quantity: 1,
                   price: 999,
-                  image: 'https://via.placeholder.com/100x100?text=Demo'
-                }
+                  image: "https://via.placeholder.com/100x100?text=Demo",
+                },
               ],
               subtotal: 999,
               shipping: 100,
               tax: 180,
               total: 1279,
               shippingAddress: {
-                firstName: 'Demo',
-                lastName: 'User',
-                address: '123 Demo Street',
-                city: 'Demo City',
-                state: 'Demo State',
-                zipCode: '12345',
-                country: 'India',
-                phone: '9876543210'
-              }
+                firstName: "Demo",
+                lastName: "User",
+                address: "123 Demo Street",
+                city: "Demo City",
+                state: "Demo State",
+                zipCode: "12345",
+                country: "India",
+                phone: "9876543210",
+              },
             };
             setOrder(demoOrder);
             return;
           }
-          
+
           // Try to fetch real order
           const response = await api.get(`/orders/${orderId}`);
           setOrder(response);
@@ -60,8 +60,8 @@ const PaymentSuccess = () => {
           setOrder(response);
         }
       } catch (error) {
-        console.error('Error fetching order:', error);
-        setError('Failed to fetch order details');
+        console.error("Error fetching order:", error);
+        setError("Failed to fetch order details");
       } finally {
         setLoading(false);
       }
@@ -86,9 +86,12 @@ const PaymentSuccess = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
           <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Order Not Found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Order Not Found
+          </h1>
           <p className="text-gray-600 mb-6">
-            {error || 'We couldn\'t find your order details. Please contact support if you need assistance.'}
+            {error ||
+              "We couldn't find your order details. Please contact support if you need assistance."}
           </p>
           <Link
             to="/"
@@ -107,16 +110,21 @@ const PaymentSuccess = () => {
         {/* Success Header */}
         <div className="text-center mb-8">
           <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Payment Successful!
+          </h1>
           <p className="text-gray-600">
-            Thank you for your order. We've received your payment and will process your order shortly.
+            Thank you for your order. We've received your payment and will
+            process your order shortly.
           </p>
         </div>
 
         {/* Order Details */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Details</h2>
-          
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Order Details
+          </h2>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
               <p className="text-sm text-gray-500">Order Number</p>
@@ -125,10 +133,10 @@ const PaymentSuccess = () => {
             <div>
               <p className="text-sm text-gray-500">Order Date</p>
               <p className="font-medium">
-                {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
+                {new Date(order.createdAt).toLocaleDateString("en-IN", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
                 })}
               </p>
             </div>
@@ -138,7 +146,9 @@ const PaymentSuccess = () => {
             </div>
             <div>
               <p className="text-sm text-gray-500">Status</p>
-              <p className="font-medium capitalize text-green-600">{order.status}</p>
+              <p className="font-medium capitalize text-green-600">
+                {order.status}
+              </p>
             </div>
           </div>
 
@@ -156,12 +166,17 @@ const PaymentSuccess = () => {
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{item.name}</p>
                     <p className="text-sm text-gray-500">
-                      {item.selectedVariant && `${item.selectedVariant.name}: ${item.selectedVariant.value}`}
+                      {item.selectedVariant &&
+                        `${item.selectedVariant.name}: ${item.selectedVariant.value}`}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">₹{item.price.toLocaleString()}</p>
-                    <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                    <p className="font-medium">
+                      ₹{item.price.toLocaleString()}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Qty: {item.quantity}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -194,14 +209,18 @@ const PaymentSuccess = () => {
         {/* Shipping Address */}
         {order.shippingAddress && (
           <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Shipping Address</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Shipping Address
+            </h2>
             <div className="text-gray-600">
               <p className="font-medium">
-                {order.shippingAddress.firstName} {order.shippingAddress.lastName}
+                {order.shippingAddress.firstName}{" "}
+                {order.shippingAddress.lastName}
               </p>
               <p>{order.shippingAddress.address}</p>
               <p>
-                {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipCode}
+                {order.shippingAddress.city}, {order.shippingAddress.state}{" "}
+                {order.shippingAddress.zipCode}
               </p>
               <p>{order.shippingAddress.country}</p>
               <p className="mt-2">Phone: {order.shippingAddress.phone}</p>
@@ -229,8 +248,11 @@ const PaymentSuccess = () => {
         {/* Support Info */}
         <div className="text-center mt-8 text-sm text-gray-500">
           <p>
-            Need help? Contact us at{' '}
-            <a href="mailto:support@sastabazar.com" className="text-black hover:underline">
+            Need help? Contact us at{" "}
+            <a
+              href="mailto:support@sastabazar.com"
+              className="text-black hover:underline"
+            >
               support@sastabazar.com
             </a>
           </p>

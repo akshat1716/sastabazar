@@ -95,6 +95,7 @@
     "concurrently": "^8.2.0",
     "eslint": "^9.37.0",
     "nodemon": "^3.0.1",
-    "pm2": "^5.3.0"
+    "pm2": "^5.3.0",
+    "start-server-and-test": "^2.1.2"
   }
 }

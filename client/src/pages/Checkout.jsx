@@ -1,62 +1,62 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useLocalCart } from '../context/LocalCartContext';
-import { useAuth } from '../context/AuthContext';
-import { toast } from 'react-hot-toast';
-import { formatCurrency } from '../services/utils';
-import paymentService from '../services/payment';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useLocalCart } from "../context/LocalCartContext";
+import { useAuth } from "../context/AuthContext";
+import { toast } from "react-hot-toast";
+import { formatCurrency } from "../services/utils";
+import paymentService from "../services/payment";
 
 const Checkout = () => {
   const { cart, clearCart } = useLocalCart();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  
+
   const [shippingAddress, setShippingAddress] = useState({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    email: user?.email || '',
-    phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    country: 'India'
+    firstName: user?.firstName || "",
+    lastName: user?.lastName || "",
+    email: user?.email || "",
+    phone: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    country: "India",
   });
 
   // Update shipping address when user data changes or loads from localStorage
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("user");
     let userData = user;
-    
+
     if (!userData && storedUser) {
       try {
         userData = JSON.parse(storedUser);
       } catch (error) {
-        console.error('Error parsing stored user:', error);
+        console.error("Error parsing stored user:", error);
       }
     }
-    
+
     if (userData) {
-      setShippingAddress(prev => ({
+      setShippingAddress((prev) => ({
         ...prev,
-        firstName: userData.firstName || userData.name?.split(' ')[0] || '',
-        lastName: userData.lastName || userData.name?.split(' ')[1] || '',
-        email: userData.email || ''
+        firstName: userData.firstName || userData.name?.split(" ")[0] || "",
+        lastName: userData.lastName || userData.name?.split(" ")[1] || "",
+        email: userData.email || "",
       }));
     }
   }, [user]);
 
   useEffect(() => {
     if (!cart || cart.items.length === 0) {
-      navigate('/cart');
+      navigate("/cart");
     }
-    
+
     // For demo purposes, we'll skip authentication requirement
     // In production, you would want to require authentication
     // const token = localStorage.getItem('token');
     // const storedUser = localStorage.getItem('user');
-    // 
+    //
     // if (!user && !token && !storedUser) {
     //   navigate('/login');
     //   return;
@@ -72,48 +72,51 @@ const Checkout = () => {
   };
 
   const handlePayment = async () => {
-    if (!shippingAddress.firstName || !shippingAddress.email || !shippingAddress.phone) {
-      toast.error('Please fill in all required fields');
+    if (
+      !shippingAddress.firstName ||
+      !shippingAddress.email ||
+      !shippingAddress.phone
+    ) {
+      toast.error("Please fill in all required fields");
       return;
     }
 
     setLoading(true);
-    
+
     try {
       // Demo payment flow - simulate order creation
       const orderData = {
-        items: cart.items.map(item => ({
+        items: cart.items.map((item) => ({
           productId: item.productId,
           name: item.productId.name,
           quantity: item.quantity,
           basePrice: item.productId.basePrice,
           selectedVariant: item.selectedVariant,
-          image: item.productId.images?.[0]?.url
+          image: item.productId.images?.[0]?.url,
         })),
         shippingAddress,
         billingAddress: shippingAddress,
-        shippingMethod: 'standard',
-        notes: ''
+        shippingMethod: "standard",
+        notes: "",
       };
 
       // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       // Generate a demo order ID
       const demoOrderId = `DEMO_${Date.now()}`;
-      
+
       // Clear cart
       clearCart();
-      
+
       // Show success message
-      toast.success('Order placed successfully!');
-      
+      toast.success("Order placed successfully!");
+
       // Redirect to success page
       navigate(`/payment/success?order_id=${demoOrderId}`);
-      
     } catch (error) {
-      console.error('Payment error:', error);
-      toast.error(error.message || 'Payment failed. Please try again.');
+      console.error("Payment error:", error);
+      toast.error(error.message || "Payment failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -141,20 +144,31 @@ const Checkout = () => {
             <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
             <div className="space-y-4">
               {cart.items.map((item) => (
-                <div key={item._id} className="flex items-center justify-between">
+                <div
+                  key={item._id}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex items-center space-x-3">
                     <img
-                      src={item.productId.images[0]?.url || '/placeholder-product.jpg'}
+                      src={
+                        item.productId.images[0]?.url ||
+                        "/placeholder-product.jpg"
+                      }
                       alt={item.productId.name}
                       className="w-12 h-12 object-cover border border-aura-200"
                     />
                     <div>
                       <div className="font-medium">{item.productId.name}</div>
-                      <div className="text-sm text-aura-600">Qty: {item.quantity}</div>
+                      <div className="text-sm text-aura-600">
+                        Qty: {item.quantity}
+                      </div>
                     </div>
                   </div>
                   <div className="font-semibold">
-                    {formatCurrency((item.productId.salePrice || item.productId.basePrice) * item.quantity)}
+                    {formatCurrency(
+                      (item.productId.salePrice || item.productId.basePrice) *
+                        item.quantity,
+                    )}
                   </div>
                 </div>
               ))}
@@ -188,7 +202,12 @@ const Checkout = () => {
                 type="text"
                 placeholder="First Name *"
                 value={shippingAddress.firstName}
-                onChange={(e) => setShippingAddress({...shippingAddress, firstName: e.target.value})}
+                onChange={(e) =>
+                  setShippingAddress({
+                    ...shippingAddress,
+                    firstName: e.target.value,
+                  })
+                }
                 className="input-field"
                 required
               />
@@ -196,14 +215,24 @@ const Checkout = () => {
                 type="text"
                 placeholder="Last Name"
                 value={shippingAddress.lastName}
-                onChange={(e) => setShippingAddress({...shippingAddress, lastName: e.target.value})}
+                onChange={(e) =>
+                  setShippingAddress({
+                    ...shippingAddress,
+                    lastName: e.target.value,
+                  })
+                }
                 className="input-field"
               />
               <input
                 type="email"
                 placeholder="Email *"
                 value={shippingAddress.email}
-                onChange={(e) => setShippingAddress({...shippingAddress, email: e.target.value})}
+                onChange={(e) =>
+                  setShippingAddress({
+                    ...shippingAddress,
+                    email: e.target.value,
+                  })
+                }
                 className="input-field"
                 required
               />
@@ -211,7 +240,12 @@ const Checkout = () => {
                 type="tel"
                 placeholder="Phone *"
                 value={shippingAddress.phone}
-                onChange={(e) => setShippingAddress({...shippingAddress, phone: e.target.value})}
+                onChange={(e) =>
+                  setShippingAddress({
+                    ...shippingAddress,
+                    phone: e.target.value,
+                  })
+                }
                 className="input-field"
                 required
               />
@@ -219,35 +253,60 @@ const Checkout = () => {
                 type="text"
                 placeholder="Address"
                 value={shippingAddress.address}
-                onChange={(e) => setShippingAddress({...shippingAddress, address: e.target.value})}
+                onChange={(e) =>
+                  setShippingAddress({
+                    ...shippingAddress,
+                    address: e.target.value,
+                  })
+                }
                 className="input-field col-span-2"
               />
               <input
                 type="text"
                 placeholder="City"
                 value={shippingAddress.city}
-                onChange={(e) => setShippingAddress({...shippingAddress, city: e.target.value})}
+                onChange={(e) =>
+                  setShippingAddress({
+                    ...shippingAddress,
+                    city: e.target.value,
+                  })
+                }
                 className="input-field"
               />
               <input
                 type="text"
                 placeholder="State"
                 value={shippingAddress.state}
-                onChange={(e) => setShippingAddress({...shippingAddress, state: e.target.value})}
+                onChange={(e) =>
+                  setShippingAddress({
+                    ...shippingAddress,
+                    state: e.target.value,
+                  })
+                }
                 className="input-field"
               />
               <input
                 type="text"
                 placeholder="ZIP Code"
                 value={shippingAddress.zipCode}
-                onChange={(e) => setShippingAddress({...shippingAddress, zipCode: e.target.value})}
+                onChange={(e) =>
+                  setShippingAddress({
+                    ...shippingAddress,
+                    zipCode: e.target.value,
+                  })
+                }
                 className="input-field"
               />
               <input
                 type="text"
                 placeholder="Country"
                 value={shippingAddress.country}
-                onChange={(e) => setShippingAddress({...shippingAddress, country: e.target.value})}
+                onChange={(e) =>
+                  setShippingAddress({
+                    ...shippingAddress,
+                    country: e.target.value,
+                  })
+                }
                 className="input-field"
               />
             </div>
@@ -258,7 +317,7 @@ const Checkout = () => {
         <div className="space-y-6">
           <div className="card p-6">
             <h2 className="text-xl font-semibold mb-4">Payment Method</h2>
-            
+
             <div className="space-y-4">
               <div className="border border-aura-200 rounded-lg p-4">
                 <div className="font-medium">Demo Payment</div>
@@ -283,7 +342,9 @@ const Checkout = () => {
               disabled={loading}
               className="btn-primary w-full mt-6"
             >
-              {loading ? 'Processing...' : `Complete Order ${formatCurrency(total)}`}
+              {loading
+                ? "Processing..."
+                : `Complete Order ${formatCurrency(total)}`}
             </button>
           </div>
         </div>

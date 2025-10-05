@@ -3,6 +3,7 @@
 ## How to Set Up Dropshipping - You Sell, Suppliers Ship!
 
 ### 🎯 What is Dropshipping?
+
 - **You list products** on your sastabazar store
 - **Customer orders** and pays you
 - **You order from supplier** (Alibaba, AliExpress, etc.)
@@ -10,6 +11,7 @@
 - **You keep the profit** margin
 
 ### 💰 Profit Example:
+
 - **Supplier Price:** ₹800 (what you pay)
 - **Your Price:** ₹1,200 (what customer pays)
 - **Your Profit:** ₹400 (33% margin)
@@ -18,6 +20,7 @@
 ### 📦 Popular Dropshipping Suppliers:
 
 #### **Global Suppliers:**
+
 1. **AliExpress** (Most Popular)
    - **Pros:** Cheapest prices, worldwide shipping
    - **Cons:** Longer shipping (15-30 days)
@@ -37,6 +40,7 @@
    - **Markup:** 40-80%
 
 #### **Indian Suppliers:**
+
 1. **IndiaMART**
    - **Pros:** Local suppliers, faster shipping
    - **Cons:** Higher prices than Chinese
@@ -52,24 +56,28 @@
 ### 🛠️ Step-by-Step Setup:
 
 #### **Step 1: Choose Your Niche**
+
 - **Electronics:** Phones, headphones, gadgets
 - **Apparel:** T-shirts, dresses, accessories
 - **Home Goods:** Kitchen items, decor
 - **Beauty:** Skincare, makeup, hair care
 
 #### **Step 2: Find Suppliers**
+
 1. **Browse AliExpress** for trending products
 2. **Check reviews** and ratings
 3. **Contact suppliers** for better prices
 4. **Test order** a few products first
 
 #### **Step 3: Set Up Your Store**
+
 1. **Add products** to your sastabazar store
 2. **Set your prices** (supplier price + markup)
 3. **Write compelling descriptions**
 4. **Add high-quality images**
 
 #### **Step 4: Process Orders**
+
 1. **Customer orders** from your store
 2. **You order** from supplier
 3. **Supplier ships** to customer
@@ -77,12 +85,12 @@
 
 ### 💡 Profit Margin Examples:
 
-| Product | Supplier Price | Your Price | Profit | Margin |
-|---------|----------------|------------|--------|--------|
-| Wireless Earbuds | ₹800 | ₹1,200 | ₹400 | 33% |
-| Cotton T-Shirt | ₹200 | ₹400 | ₹200 | 50% |
-| Phone Case | ₹150 | ₹300 | ₹150 | 50% |
-| Bluetooth Speaker | ₹1,500 | ₹2,500 | ₹1,000 | 40% |
+| Product           | Supplier Price | Your Price | Profit | Margin |
+| ----------------- | -------------- | ---------- | ------ | ------ |
+| Wireless Earbuds  | ₹800           | ₹1,200     | ₹400   | 33%    |
+| Cotton T-Shirt    | ₹200           | ₹400       | ₹200   | 50%    |
+| Phone Case        | ₹150           | ₹300       | ₹150   | 50%    |
+| Bluetooth Speaker | ₹1,500         | ₹2,500     | ₹1,000 | 40%    |
 
 ### 🚀 Quick Start Checklist:
 
@@ -105,6 +113,7 @@
 ### 🎯 Best Dropshipping Products:
 
 #### **High-Demand Categories:**
+
 - **Electronics:** Phone accessories, headphones, smartwatches
 - **Apparel:** T-shirts, dresses, shoes, bags
 - **Home:** Kitchen gadgets, decor, bedding
@@ -112,6 +121,7 @@
 - **Sports:** Fitness equipment, yoga mats
 
 #### **Product Selection Criteria:**
+
 - **High demand** (trending on AliExpress)
 - **Good reviews** (4+ stars)
 - **Reasonable shipping** (under 30 days)
@@ -121,12 +131,14 @@
 ### 💰 Pricing Strategy:
 
 #### **Markup Guidelines:**
+
 - **Electronics:** 40-60% markup
 - **Apparel:** 50-100% markup
 - **Accessories:** 60-120% markup
 - **Home Goods:** 40-80% markup
 
 #### **Pricing Formula:**
+
 ```
 Your Price = Supplier Price + Markup + Shipping + Profit
 ```
@@ -142,6 +154,7 @@ Your Price = Supplier Price + Markup + Shipping + Profit
 ### 📞 Supplier Communication:
 
 #### **Key Questions to Ask:**
+
 - What's your minimum order quantity?
 - What are your shipping times?
 - Do you offer tracking numbers?

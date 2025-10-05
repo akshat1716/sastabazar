@@ -7,12 +7,14 @@ This document outlines how to configure GitHub Actions environments and secrets 
 ## 📋 **Required Environments**
 
 ### **1. Staging Environment**
+
 - **Purpose**: Pre-production testing and validation
 - **Branch**: `develop`
 - **URL**: `https://staging.sastabazar.com`
 - **Database**: Staging MongoDB Atlas cluster
 
 ### **2. Production Environment**
+
 - **Purpose**: Live production deployment
 - **Branch**: `main`
 - **URL**: `https://sastabazar.com`
@@ -23,16 +25,19 @@ This document outlines how to configure GitHub Actions environments and secrets 
 ### **Staging Environment Secrets**
 
 #### **Database Configuration**
+
 ```bash
 STAGING_MONGODB_URI=mongodb+srv://staging-user:password@cluster.mongodb.net/sastabazar-staging?retryWrites=true&w=majority
 ```
 
 #### **Authentication**
+
 ```bash
 STAGING_JWT_SECRET=your-staging-jwt-secret-key-make-it-long-and-random
 ```
 
 #### **Payment Gateways**
+
 ```bash
 # Razorpay (Test Mode)
 STAGING_RAZORPAY_KEY_ID=rzp_test_your_staging_key_id
@@ -45,6 +50,7 @@ STAGING_STRIPE_WEBHOOK_SECRET=whsec_your_staging_stripe_webhook_secret
 ```
 
 #### **Deployment Configuration**
+
 ```bash
 # Server Details
 STAGING_HOST=staging.your-domain.com
@@ -62,16 +68,19 @@ STAGING_URL=https://staging.sastabazar.com
 ### **Production Environment Secrets**
 
 #### **Database Configuration**
+
 ```bash
 PRODUCTION_MONGODB_URI=mongodb+srv://prod-user:password@cluster.mongodb.net/sastabazar?retryWrites=true&w=majority
 ```
 
 #### **Authentication**
+
 ```bash
 PRODUCTION_JWT_SECRET=your-production-jwt-secret-key-make-it-long-and-random-and-different-from-staging
 ```
 
 #### **Payment Gateways**
+
 ```bash
 # Razorpay (Live Mode)
 PRODUCTION_RAZORPAY_KEY_ID=rzp_live_your_production_key_id
@@ -84,6 +93,7 @@ PRODUCTION_STRIPE_WEBHOOK_SECRET=whsec_your_production_stripe_webhook_secret
 ```
 
 #### **Deployment Configuration**
+
 ```bash
 # Server Details
 PRODUCTION_HOST=your-domain.com
@@ -126,11 +136,13 @@ PRODUCTION_URL=https://sastabazar.com
 ### **2. Add Environment Secrets**
 
 #### **For Staging Environment**
+
 1. Click on `staging` environment
 2. Click "Add secret" for each required secret
 3. Add all staging secrets listed above
 
 #### **For Production Environment**
+
 1. Click on `production` environment
 2. Click "Add secret" for each required secret
 3. Add all production secrets listed above
@@ -163,18 +175,21 @@ PRODUCTION_URL=https://sastabazar.com
 ## 🔒 **Security Best Practices**
 
 ### **Secret Management**
+
 - ✅ **Use Different Secrets**: Never reuse secrets between environments
 - ✅ **Rotate Regularly**: Change secrets periodically
 - ✅ **Least Privilege**: Use minimal required permissions
 - ✅ **Monitor Access**: Review secret access logs regularly
 
 ### **Environment Protection**
+
 - ✅ **Required Reviewers**: Require approval for production deployments
 - ✅ **Wait Timers**: Add delays for production deployments
 - ✅ **Branch Restrictions**: Limit deployment branches
 - ✅ **Status Checks**: Require all checks to pass
 
 ### **Access Control**
+
 - ✅ **Team Permissions**: Limit repository access
 - ✅ **Deployment Permissions**: Restrict deployment access
 - ✅ **Secret Access**: Monitor secret usage
@@ -183,6 +198,7 @@ PRODUCTION_URL=https://sastabazar.com
 ## 🧪 **Testing the Setup**
 
 ### **1. Test Staging Deployment**
+
 ```bash
 # Push to develop branch
 git checkout develop
@@ -193,6 +209,7 @@ git push origin develop
 ```
 
 ### **2. Test Production Deployment**
+
 ```bash
 # Merge develop to main
 git checkout main
@@ -204,6 +221,7 @@ git push origin main
 ```
 
 ### **3. Test Manual Deployment**
+
 ```bash
 # Go to Actions tab
 # Select "CI/CD Pipeline"
@@ -216,24 +234,28 @@ git push origin main
 ### **Common Issues**
 
 #### **Secret Not Found**
+
 ```bash
 # Error: Secret not found
 # Solution: Check secret name spelling and environment
 ```
 
 #### **SSH Connection Failed**
+
 ```bash
 # Error: SSH connection failed
 # Solution: Verify SSH key format and server access
 ```
 
 #### **Database Connection Failed**
+
 ```bash
 # Error: Database connection failed
 # Solution: Check MongoDB URI and network access
 ```
 
 #### **Deployment Failed**
+
 ```bash
 # Error: Deployment failed
 # Solution: Check server logs and PM2 status
@@ -242,12 +264,14 @@ git push origin main
 ### **Debug Commands**
 
 #### **Check GitHub Actions Logs**
+
 1. Go to Actions tab
 2. Click on failed workflow
 3. Click on failed job
 4. Review error logs
 
 #### **Check Server Status**
+
 ```bash
 # SSH into server
 ssh user@server
@@ -265,6 +289,7 @@ pm2 monit
 ## 📊 **Monitoring Setup**
 
 ### **Health Check Endpoints**
+
 ```bash
 # API Health
 curl https://staging.sastabazar.com/api/health
@@ -276,6 +301,7 @@ curl https://sastabazar.com/api/health/db
 ```
 
 ### **GitHub Actions Monitoring**
+
 - ✅ **Workflow Status**: Monitor workflow success/failure
 - ✅ **Deployment History**: Track deployment history
 - ✅ **Performance Metrics**: Monitor build and test times
@@ -292,4 +318,3 @@ Your GitHub Actions environments are now configured with:
 - ✅ **Monitoring and Alerting** configured
 
 The CI/CD pipeline is ready for automated deployments! 🚀
-

@@ -45,6 +45,7 @@ Your sastabazar e-commerce website now has a complete Stripe payment gateway int
 ### 🔧 **Setup Required:**
 
 #### **1. Stripe Account Setup:**
+
 1. Create a Stripe account at [stripe.com](https://stripe.com)
 2. Get your API keys from the Stripe Dashboard
 3. Set up webhook endpoints
@@ -52,6 +53,7 @@ Your sastabazar e-commerce website now has a complete Stripe payment gateway int
 #### **2. Environment Variables:**
 
 **Backend (`.env`):**
+
 ```env
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
 STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
@@ -59,11 +61,13 @@ CLIENT_URL=http://localhost:5173
 ```
 
 **Frontend (`client/.env`):**
+
 ```env
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
 ```
 
 #### **3. Webhook Configuration:**
+
 1. In Stripe Dashboard → Webhooks
 2. Add endpoint: `https://your-domain.com/api/payments/webhook`
 3. Select events: `payment_intent.succeeded`, `payment_intent.payment_failed`, `checkout.session.completed`
@@ -72,6 +76,7 @@ VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
 ### 🚀 **Payment Flow:**
 
 #### **Option 1: Embedded Checkout (Recommended)**
+
 1. User adds items to cart
 2. Clicks "Proceed to Checkout"
 3. Fills shipping address
@@ -80,6 +85,7 @@ VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
 6. Success/cancel page shown
 
 #### **Option 2: Stripe Checkout (Redirect)**
+
 1. User adds items to cart
 2. Clicks "Proceed to Checkout"
 3. Redirected to Stripe's hosted checkout
@@ -87,12 +93,14 @@ VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
 5. Redirected back to success/cancel page
 
 ### 💳 **Supported Payment Methods:**
+
 - ✅ Credit/Debit Cards (Visa, Mastercard, American Express)
 - ✅ Digital Wallets (Apple Pay, Google Pay)
 - ✅ UPI (for Indian customers)
 - ✅ Net Banking (for Indian customers)
 
 ### 🔒 **Security Features:**
+
 - ✅ PCI DSS compliant (handled by Stripe)
 - ✅ Secure payment processing
 - ✅ Webhook signature verification
@@ -100,18 +108,22 @@ VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
 - ✅ Error handling and validation
 
 ### 📊 **Payment Tracking:**
+
 - ✅ Order status updates
 - ✅ Payment confirmation emails
 - ✅ Refund processing
 - ✅ Payment history in user profile
 
 ### 🧪 **Testing:**
+
 Use Stripe's test cards:
+
 - **Success**: `4242 4242 4242 4242`
 - **Decline**: `4000 0000 0000 0002`
 - **Expired**: `4000 0000 0000 0069`
 
 ### 🎨 **UI Features:**
+
 - ✅ Modern, minimalist design matching sastabazar theme
 - ✅ Responsive layout for all devices
 - ✅ Loading states and error handling
@@ -119,6 +131,7 @@ Use Stripe's test cards:
 - ✅ Indian Rupee (₹) currency support
 
 ### 📱 **Mobile Optimized:**
+
 - ✅ Touch-friendly payment forms
 - ✅ Mobile-responsive design
 - ✅ Optimized for mobile browsers
@@ -141,10 +154,11 @@ Use Stripe's test cards:
 - **UI Theme**: Customize colors and styling
 
 ### 📞 **Support:**
+
 - Stripe Documentation: [stripe.com/docs](https://stripe.com/docs)
 - Stripe Support: Available in your dashboard
 - Webhook Testing: Use Stripe CLI for local testing
 
 ---
 
-**🎉 Your sastabazar e-commerce website now has a complete, production-ready payment system!** 
+**🎉 Your sastabazar e-commerce website now has a complete, production-ready payment system!**

@@ -1,23 +1,23 @@
-import { Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './context/AuthContext'
-import { LocalCartProvider } from './context/LocalCartContext'
-import Layout from './components/Layout'
-import Home from './pages/Home'
-import Products from './pages/Products'
-import ProductDetail from './pages/ProductDetail'
-import Cart from './pages/Cart'
-import Checkout from './pages/Checkout'
-import PaymentSuccess from './pages/PaymentSuccess'
-import PaymentCancel from './pages/PaymentCancel'
-import TestCheckout from './pages/TestCheckout'
-import Wishlist from './pages/Wishlist'
-import Admin from './pages/Admin'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Profile from './pages/Profile'
-import Orders from './pages/Orders'
-import OrderDetail from './pages/OrderDetail'
-import NotFound from './pages/NotFound'
+import { Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { LocalCartProvider } from "./context/LocalCartContext";
+import Layout from "./components/Layout";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
+import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import PaymentCancel from "./pages/PaymentCancel";
+import TestCheckout from "./pages/TestCheckout";
+import Wishlist from "./pages/Wishlist";
+import Admin from "./pages/Admin";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Profile from "./pages/Profile";
+import Orders from "./pages/Orders";
+import OrderDetail from "./pages/OrderDetail";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -45,7 +45,7 @@ function App() {
         </Layout>
       </LocalCartProvider>
     </AuthProvider>
-  )
+  );
 }
 
-export default App
+export default App;

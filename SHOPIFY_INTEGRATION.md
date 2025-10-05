@@ -3,16 +3,19 @@
 ## 📋 Integration Options
 
 ### **Option 1: Shopify Storefront API (Recommended)**
+
 - Keep your custom frontend design
 - Use Shopify as the backend for products, orders, payments
 - Best for: Custom design with Shopify's reliability
 
 ### **Option 2: Shopify Headless Commerce**
+
 - Use Shopify's admin for product management
 - Custom frontend with Shopify's APIs
 - Best for: Full control with Shopify's infrastructure
 
 ### **Option 3: Shopify App Development**
+
 - Create a Shopify app that integrates with your site
 - Best for: Advanced integrations and custom features
 
@@ -27,6 +30,7 @@
    - Create a partner account
 
 2. **Create a Private App**
+
    ```bash
    # In your Shopify admin:
    # Settings > Apps and sales channels > Develop apps > Create an app
@@ -48,11 +52,11 @@ npm install shopify-buy
 
 ```javascript
 // client/src/services/shopify.js
-import Client from 'shopify-buy';
+import Client from "shopify-buy";
 
 const client = Client.buildClient({
-  domain: 'your-store.myshopify.com',
-  storefrontAccessToken: 'your-storefront-access-token'
+  domain: "your-store.myshopify.com",
+  storefrontAccessToken: "your-storefront-access-token",
 });
 
 export const shopifyService = {
@@ -60,23 +64,23 @@ export const shopifyService = {
   async getProducts() {
     try {
       const products = await client.product.fetchAll();
-      return products.map(product => ({
+      return products.map((product) => ({
         id: product.id,
         title: product.title,
         description: product.description,
         price: product.variants[0].price,
-        images: product.images.map(img => img.src),
-        variants: product.variants.map(variant => ({
+        images: product.images.map((img) => img.src),
+        variants: product.variants.map((variant) => ({
           id: variant.id,
           title: variant.title,
           price: variant.price,
-          available: variant.available
+          available: variant.available,
         })),
         tags: product.tags,
-        category: product.productType
+        category: product.productType,
       }));
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error("Error fetching products:", error);
       return [];
     }
   },
@@ -90,18 +94,18 @@ export const shopifyService = {
         title: product.title,
         description: product.description,
         price: product.variants[0].price,
-        images: product.images.map(img => img.src),
-        variants: product.variants.map(variant => ({
+        images: product.images.map((img) => img.src),
+        variants: product.variants.map((variant) => ({
           id: variant.id,
           title: variant.title,
           price: variant.price,
-          available: variant.available
+          available: variant.available,
         })),
         tags: product.tags,
-        category: product.productType
+        category: product.productType,
       };
     } catch (error) {
-      console.error('Error fetching product:', error);
+      console.error("Error fetching product:", error);
       return null;
     }
   },
@@ -112,7 +116,7 @@ export const shopifyService = {
       const checkout = await client.checkout.create();
       return checkout;
     } catch (error) {
-      console.error('Error creating checkout:', error);
+      console.error("Error creating checkout:", error);
       return null;
     }
   },
@@ -120,16 +124,18 @@ export const shopifyService = {
   // Add items to cart
   async addToCart(checkoutId, variantId, quantity = 1) {
     try {
-      const checkout = await client.checkout.addLineItems(checkoutId, [{
-        variantId,
-        quantity
-      }]);
+      const checkout = await client.checkout.addLineItems(checkoutId, [
+        {
+          variantId,
+          quantity,
+        },
+      ]);
       return checkout;
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      console.error("Error adding to cart:", error);
       return null;
     }
-  }
+  },
 };
 ```
 
@@ -137,8 +143,8 @@ export const shopifyService = {
 
 ```javascript
 // client/src/pages/Products.jsx
-import { useEffect, useState } from 'react';
-import { shopifyService } from '../services/shopify';
+import { useEffect, useState } from "react";
+import { shopifyService } from "../services/shopify";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -161,19 +167,19 @@ const Products = () => {
 
 ```javascript
 // client/src/context/CartContext.jsx
-import { shopifyService } from '../services/shopify';
+import { shopifyService } from "../services/shopify";
 
 // Update cart operations to use Shopify
 const addToCart = async (product, variant, quantity) => {
   try {
     const checkout = await shopifyService.addToCart(
-      currentCheckout.id, 
-      variant.id, 
-      quantity
+      currentCheckout.id,
+      variant.id,
+      quantity,
     );
     setCurrentCheckout(checkout);
   } catch (error) {
-    console.error('Error adding to cart:', error);
+    console.error("Error adding to cart:", error);
   }
 };
 ```
@@ -225,6 +231,7 @@ shopify app config link
 ```
 
 ### **App Structure**
+
 ```
 shopify-app/
 ├── web/
@@ -239,6 +246,7 @@ shopify-app/
 ## 🎯 **Recommended Approach for sastabazar**
 
 ### **For Your Current Setup:**
+
 1. **Start with Option 1** (Storefront API)
 2. **Keep your current design** and UI
 3. **Use Shopify for:**
@@ -248,11 +256,12 @@ shopify-app/
    - Inventory management
 
 ### **Benefits:**
+
 ✅ **Keep your custom design**  
 ✅ **Use Shopify's reliable backend**  
 ✅ **Easy product management**  
 ✅ **Built-in payment processing**  
-✅ **Inventory and order management**  
+✅ **Inventory and order management**
 
 ---
 
@@ -267,12 +276,14 @@ shopify-app/
    - Get access token
 
 3. **Update Environment Variables**
+
    ```bash
    SHOPIFY_STORE_URL=your-store.myshopify.com
    SHOPIFY_STOREFRONT_ACCESS_TOKEN=your-token
    ```
 
 4. **Install Shopify SDK**
+
    ```bash
    npm install shopify-buy
    ```
@@ -287,7 +298,7 @@ shopify-app/
 ## 💰 **Pricing Considerations**
 
 - **Shopify Basic**: $29/month
-- **Shopify Standard**: $79/month  
+- **Shopify Standard**: $79/month
 - **Shopify Advanced**: $299/month
 - **Transaction fees**: 2.9% + 30¢ per transaction
 
@@ -302,4 +313,4 @@ shopify-app/
 5. **Test the integration**
 6. **Deploy to production**
 
-**Would you like me to help you implement any of these approaches?** 
+**Would you like me to help you implement any of these approaches?**

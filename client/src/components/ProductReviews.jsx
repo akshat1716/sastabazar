@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useParams } from 'react-router-dom';
-import api from '../utils/api';
-import { Star, ThumbsUp, MessageCircle } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext";
+import { useParams } from "react-router-dom";
+import api from "../utils/api";
+import { Star, ThumbsUp, MessageCircle } from "lucide-react";
 
 const ProductReviews = ({ productId }) => {
   const { user, isAuthenticated } = useAuth();
@@ -11,8 +11,8 @@ const ProductReviews = ({ productId }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [newReview, setNewReview] = useState({
     rating: 5,
-    title: '',
-    comment: ''
+    title: "",
+    comment: "",
   });
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const ProductReviews = ({ productId }) => {
       const response = await api.get(`/products/${productId}/reviews`);
       setReviews(response.data.reviews);
     } catch (error) {
-      console.error('Failed to load reviews:', error);
+      console.error("Failed to load reviews:", error);
     } finally {
       setLoading(false);
     }
@@ -34,25 +34,30 @@ const ProductReviews = ({ productId }) => {
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post(`/products/${productId}/reviews`, newReview);
+      const response = await api.post(
+        `/products/${productId}/reviews`,
+        newReview,
+      );
       setReviews([response.data.review, ...reviews]);
-      setNewReview({ rating: 5, title: '', comment: '' });
+      setNewReview({ rating: 5, title: "", comment: "" });
       setShowReviewForm(false);
     } catch (error) {
-      console.error('Failed to submit review:', error);
+      console.error("Failed to submit review:", error);
     }
   };
 
   const handleLikeReview = async (reviewId) => {
     try {
       await api.post(`/reviews/${reviewId}/like`);
-      setReviews(reviews.map(review => 
-        review._id === reviewId 
-          ? { ...review, likes: review.likes + 1, userLiked: true }
-          : review
-      ));
+      setReviews(
+        reviews.map((review) =>
+          review._id === reviewId
+            ? { ...review, likes: review.likes + 1, userLiked: true }
+            : review,
+        ),
+      );
     } catch (error) {
-      console.error('Failed to like review:', error);
+      console.error("Failed to like review:", error);
     }
   };
 
@@ -61,7 +66,7 @@ const ProductReviews = ({ productId }) => {
       <Star
         key={i}
         size={16}
-        className={`${i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+        className={`${i < rating ? "text-yellow-400 fill-current" : "text-gray-300"}`}
       />
     ));
   };
@@ -95,7 +100,9 @@ const ProductReviews = ({ productId }) => {
       {/* Review Form */}
       {showReviewForm && (
         <div className="bg-gray-50 rounded-lg p-6">
-          <h4 className="text-lg font-medium text-gray-900 mb-4">Write Your Review</h4>
+          <h4 className="text-lg font-medium text-gray-900 mb-4">
+            Write Your Review
+          </h4>
           <form onSubmit={handleSubmitReview} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -106,12 +113,14 @@ const ProductReviews = ({ productId }) => {
                   <button
                     key={i}
                     type="button"
-                    onClick={() => setNewReview({ ...newReview, rating: i + 1 })}
+                    onClick={() =>
+                      setNewReview({ ...newReview, rating: i + 1 })
+                    }
                     className="focus:outline-none"
                   >
                     <Star
                       size={24}
-                      className={`${i < newReview.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+                      className={`${i < newReview.rating ? "text-yellow-400 fill-current" : "text-gray-300"}`}
                     />
                   </button>
                 ))}
@@ -125,7 +134,9 @@ const ProductReviews = ({ productId }) => {
               <input
                 type="text"
                 value={newReview.title}
-                onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
+                onChange={(e) =>
+                  setNewReview({ ...newReview, title: e.target.value })
+                }
                 className="input-field"
                 placeholder="Summarize your experience"
                 required
@@ -138,7 +149,9 @@ const ProductReviews = ({ productId }) => {
               </label>
               <textarea
                 value={newReview.comment}
-                onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+                onChange={(e) =>
+                  setNewReview({ ...newReview, comment: e.target.value })
+                }
                 rows={4}
                 className="input-field"
                 placeholder="Share your detailed experience with this product"
@@ -166,7 +179,9 @@ const ProductReviews = ({ productId }) => {
       {reviews.length === 0 ? (
         <div className="text-center py-8">
           <MessageCircle className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-          <h4 className="text-lg font-medium text-gray-900 mb-2">No reviews yet</h4>
+          <h4 className="text-lg font-medium text-gray-900 mb-2">
+            No reviews yet
+          </h4>
           <p className="text-gray-500">
             Be the first to share your experience with this product.
           </p>
@@ -174,12 +189,16 @@ const ProductReviews = ({ productId }) => {
       ) : (
         <div className="space-y-6">
           {reviews.map((review) => (
-            <div key={review._id} className="bg-white rounded-lg border border-gray-200 p-6">
+            <div
+              key={review._id}
+              className="bg-white rounded-lg border border-gray-200 p-6"
+            >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center space-x-3">
                   <div className="h-10 w-10 rounded-full bg-aura-100 flex items-center justify-center">
                     <span className="text-sm font-medium text-aura-900">
-                      {review.userId?.firstName?.[0]}{review.userId?.lastName?.[0]}
+                      {review.userId?.firstName?.[0]}
+                      {review.userId?.lastName?.[0]}
                     </span>
                   </div>
                   <div>
@@ -187,9 +206,7 @@ const ProductReviews = ({ productId }) => {
                       {review.userId?.firstName} {review.userId?.lastName}
                     </h5>
                     <div className="flex items-center space-x-2">
-                      <div className="flex">
-                        {renderStars(review.rating)}
-                      </div>
+                      <div className="flex">{renderStars(review.rating)}</div>
                       <span className="text-sm text-gray-500">
                         {new Date(review.createdAt).toLocaleDateString()}
                       </span>
@@ -199,7 +216,9 @@ const ProductReviews = ({ productId }) => {
               </div>
 
               {review.title && (
-                <h6 className="font-medium text-gray-900 mb-2">{review.title}</h6>
+                <h6 className="font-medium text-gray-900 mb-2">
+                  {review.title}
+                </h6>
               )}
 
               <p className="text-gray-700 mb-4">{review.comment}</p>
@@ -208,7 +227,9 @@ const ProductReviews = ({ productId }) => {
                 <button
                   onClick={() => handleLikeReview(review._id)}
                   className={`flex items-center space-x-1 text-sm ${
-                    review.userLiked ? 'text-blue-600' : 'text-gray-500 hover:text-blue-600'
+                    review.userLiked
+                      ? "text-blue-600"
+                      : "text-gray-500 hover:text-blue-600"
                   }`}
                 >
                   <ThumbsUp size={16} />
@@ -223,4 +244,4 @@ const ProductReviews = ({ productId }) => {
   );
 };
 
-export default ProductReviews; 
+export default ProductReviews;

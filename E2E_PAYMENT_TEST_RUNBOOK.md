@@ -16,11 +16,13 @@ This runbook provides step-by-step instructions for testing payment flows end-to
 ## Prerequisites
 
 ### Required Accounts
+
 - **Razorpay Test Account**: [https://razorpay.com](https://razorpay.com)
 - **Stripe Test Account**: [https://stripe.com](https://stripe.com)
 - **MongoDB Atlas Account**: [https://cloud.mongodb.com](https://cloud.mongodb.com)
 
 ### Required Tools
+
 - Node.js 18+ installed
 - MongoDB Atlas cluster running
 - Test credit cards (provided by payment gateways)
@@ -28,6 +30,7 @@ This runbook provides step-by-step instructions for testing payment flows end-to
 - Browser with developer tools
 
 ### Test Data
+
 - Test user accounts
 - Test products with known prices
 - Test credit cards (Razorpay: 4111 1111 1111 1111, Stripe: 4242 4242 4242 4242)
@@ -131,6 +134,7 @@ curl -X POST http://localhost:5000/api/payments/razorpay/order \
 ```
 
 **Expected Response:**
+
 ```json
 {
   "success": true,
@@ -148,22 +152,23 @@ curl -X POST http://localhost:5000/api/payments/razorpay/order \
 #### Step 2: Process Live Payment
 
 1. **Open Razorpay Checkout:**
+
    ```javascript
    // In browser console or test script
    const options = {
-     key: 'rzp_test_your_test_key_id',
+     key: "rzp_test_your_test_key_id",
      amount: 10000, // Amount from order response
-     currency: 'INR',
-     name: 'Sastabazar',
-     description: 'Test Order',
-     order_id: 'order_xyz123', // From order response
+     currency: "INR",
+     name: "Sastabazar",
+     description: "Test Order",
+     order_id: "order_xyz123", // From order response
      handler: function (response) {
-       console.log('Payment successful:', response);
+       console.log("Payment successful:", response);
        // Verify payment on server
        verifyPayment(response);
-     }
+     },
    };
-   
+
    const rzp = new Razorpay(options);
    rzp.open();
    ```
@@ -190,6 +195,7 @@ curl -X POST http://localhost:5000/api/payments/razorpay/verify \
 ```
 
 **Expected Response:**
+
 ```json
 {
   "success": true,
@@ -211,6 +217,7 @@ curl -X GET http://localhost:5000/api/orders/507f1f77bcf86cd799439011 \
 ```
 
 **Verification Checklist:**
+
 - [ ] Order status changed to "confirmed"
 - [ ] Payment status changed to "paid"
 - [ ] Cart is cleared
@@ -275,9 +282,10 @@ curl -X POST http://localhost:5000/api/payments/stripe/create-checkout-session \
 #### Step 2: Complete Payment
 
 1. **Redirect to Stripe Checkout:**
+
    ```javascript
    // Use session URL from response
-   window.location.href = 'https://checkout.stripe.com/pay/cs_test_xyz123';
+   window.location.href = "https://checkout.stripe.com/pay/cs_test_xyz123";
    ```
 
 2. **Use Test Card:**
@@ -321,14 +329,14 @@ npm run test:e2e -- --ci
 ```javascript
 // tests/config/test-config.js
 module.exports = {
-  baseURL: 'http://localhost:5000',
+  baseURL: "http://localhost:5000",
   testUser: {
-    email: 'test@example.com',
-    password: 'testpassword123'
+    email: "test@example.com",
+    password: "testpassword123",
   },
   testAmount: 100, // ₹1.00 in paise
   timeout: 30000,
-  retries: 3
+  retries: 3,
 };
 ```
 
@@ -346,6 +354,7 @@ module.exports = {
 ### Test Scenarios
 
 #### Scenario 1: Successful Payment Flow
+
 1. User adds product to cart
 2. User proceeds to checkout
 3. User completes payment
@@ -354,12 +363,14 @@ module.exports = {
 6. User receives confirmation
 
 #### Scenario 2: Payment Failure
+
 1. User attempts payment with invalid card
 2. Payment fails
 3. Order remains in pending state
 4. User can retry payment
 
 #### Scenario 3: Network Interruption
+
 1. User initiates payment
 2. Network connection is lost
 3. Payment status is unclear
@@ -367,6 +378,7 @@ module.exports = {
 5. Payment can be retried if needed
 
 #### Scenario 4: Duplicate Payment
+
 1. User completes payment
 2. User accidentally submits payment again
 3. System handles duplicate gracefully
@@ -375,20 +387,25 @@ module.exports = {
 ### Verification Steps
 
 #### Database Verification
+
 ```javascript
 // Check order in database
 db.orders.findOne({ orderNumber: "ORD-1234567890-abc123" });
 
 // Verify payment details
-db.orders.findOne({ 
-  orderNumber: "ORD-1234567890-abc123" 
-}, { paymentDetails: 1 });
+db.orders.findOne(
+  {
+    orderNumber: "ORD-1234567890-abc123",
+  },
+  { paymentDetails: 1 },
+);
 
 // Check cart is cleared
 db.carts.findOne({ userId: ObjectId("USER_ID") });
 ```
 
 #### Log Verification
+
 ```bash
 # Check payment logs
 grep "payment_verified" logs/combined.log
@@ -405,29 +422,37 @@ grep "webhook" logs/combined.log
 ### Common Issues
 
 #### 1. Payment Verification Fails
+
 **Symptoms:** Signature verification error
 **Solutions:**
+
 - Check Razorpay key secret is correct
 - Verify signature generation algorithm
 - Ensure order ID and payment ID match
 
 #### 2. Order Not Found
+
 **Symptoms:** 404 error when verifying payment
 **Solutions:**
+
 - Check internal_order_id is correct
 - Verify order exists in database
 - Check order was created before payment
 
 #### 3. Cart Not Cleared
+
 **Symptoms:** Items remain in cart after payment
 **Solutions:**
+
 - Check user ID matches between order and cart
 - Verify cart update query
 - Check for database transaction issues
 
 #### 4. Stock Not Updated
+
 **Symptoms:** Product stock unchanged after order
 **Solutions:**
+
 - Verify product ID in order items
 - Check stock update query
 - Ensure product exists in database
@@ -501,6 +526,7 @@ echo "🔍 Check logs and database for results"
 ## Test Data Management
 
 ### Test User Accounts
+
 ```json
 {
   "testUsers": [
@@ -519,6 +545,7 @@ echo "🔍 Check logs and database for results"
 ```
 
 ### Test Products
+
 ```json
 {
   "testProducts": [
@@ -541,11 +568,13 @@ echo "🔍 Check logs and database for results"
 ### Test Credit Cards
 
 #### Razorpay Test Cards
+
 - **Success:** 4111 1111 1111 1111
 - **Failure:** 4000 0000 0000 0002
 - **3D Secure:** 4000 0000 0000 3220
 
 #### Stripe Test Cards
+
 - **Success:** 4242 4242 4242 4242
 - **Failure:** 4000 0000 0000 0002
 - **3D Secure:** 4000 0000 0000 3220
@@ -555,6 +584,3 @@ echo "🔍 Check logs and database for results"
 This runbook provides comprehensive guidance for testing payment flows in the Sastabazar e-commerce platform. Always test thoroughly in development and staging environments before deploying to production. Keep test amounts small and monitor all transactions closely.
 
 For questions or issues, refer to the troubleshooting section or contact the development team.
-
-
-

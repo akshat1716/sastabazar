@@ -7,6 +7,7 @@ Your sastabazar e-commerce website now has a robust, production-ready database c
 ## ✅ **What's Been Implemented**
 
 ### **1. MongoDB Atlas Integration** 🗄️
+
 - ✅ **Robust Connection Module**: `server/config/database.js` with retry logic
 - ✅ **Connection Retry**: Automatic reconnection with exponential backoff
 - ✅ **Health Monitoring**: Database health check endpoint `/api/health/db`
@@ -14,12 +15,14 @@ Your sastabazar e-commerce website now has a robust, production-ready database c
 - ✅ **Connection Pooling**: Optimized connection management
 
 ### **2. Database Standardization** 📊
+
 - ✅ **Standardized Name**: All references now use `sastabazar` database
 - ✅ **Environment Configuration**: MongoDB URI from `.env` file
 - ✅ **Production Ready**: Supports MongoDB Atlas connection strings
 - ✅ **Index Optimization**: Performance indexes for all collections
 
 ### **3. Production Deployment** 🚀
+
 - ✅ **Static File Serving**: Express serves React build in production
 - ✅ **PM2 Configuration**: Process management with ecosystem.config.js
 - ✅ **Health Endpoints**: `/api/health` and `/api/health/db`
@@ -28,6 +31,7 @@ Your sastabazar e-commerce website now has a robust, production-ready database c
 ## 🔧 **Database Configuration**
 
 ### **Environment Variables**
+
 ```env
 # MongoDB Atlas Connection
 MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/sastabazar?retryWrites=true&w=majority
@@ -37,8 +41,9 @@ MONGODB_URI=mongodb://localhost:27017/sastabazar
 ```
 
 ### **MongoDB Atlas Setup**
+
 1. **Create Cluster**: Go to [MongoDB Atlas](https://cloud.mongodb.com)
-2. **Create Database User**: 
+2. **Create Database User**:
    - Username: `sastabazar-user`
    - Password: `strong-password`
    - Database User Privileges: `Read and write to any database`
@@ -51,6 +56,7 @@ MONGODB_URI=mongodb://localhost:27017/sastabazar
 ### **Option 1: Monorepo Deployment (Recommended)**
 
 #### **Single Server Deployment**
+
 ```bash
 # Build the application
 npm run build:all
@@ -63,7 +69,9 @@ npm run logs:pm2
 ```
 
 #### **Deployment Steps**
+
 1. **Server Setup**:
+
    ```bash
    # Install Node.js and PM2
    curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
@@ -72,23 +80,24 @@ npm run logs:pm2
    ```
 
 2. **Deploy Application**:
+
    ```bash
    # Clone repository
    git clone https://github.com/your-username/sastabazar.git
    cd sastabazar
-   
+
    # Install dependencies
    npm run install-all
-   
+
    # Run database migration
    npm run migrate
-   
+
    # Add sample products
    npm run seed
-   
+
    # Build for production
    npm run build:all
-   
+
    # Start with PM2
    npm run start:pm2
    ```
@@ -98,7 +107,7 @@ npm run logs:pm2
    server {
        listen 80;
        server_name your-domain.com;
-       
+
        location / {
            proxy_pass http://localhost:5001;
            proxy_http_version 1.1;
@@ -116,6 +125,7 @@ npm run logs:pm2
 ### **Option 2: Split Deployment**
 
 #### **Frontend on Vercel/Netlify**
+
 ```bash
 # Frontend deployment
 cd client
@@ -129,6 +139,7 @@ netlify deploy --prod --dir=dist
 ```
 
 #### **Backend on Render/Railway/AWS**
+
 ```bash
 # Backend deployment
 npm run build:server
@@ -136,6 +147,7 @@ npm start
 ```
 
 #### **Environment Variables for Split Deployment**
+
 ```env
 # Frontend (.env.production)
 VITE_SERVER_URL=https://your-api-domain.com
@@ -152,6 +164,7 @@ CORS_ORIGIN=https://your-frontend-domain.com
 ## 🛠️ **PM2 Process Management**
 
 ### **PM2 Commands**
+
 ```bash
 # Start application
 npm run start:pm2
@@ -176,6 +189,7 @@ pm2 startup
 ```
 
 ### **PM2 Ecosystem Features**
+
 - ✅ **Auto-restart**: Restarts on crashes
 - ✅ **Memory monitoring**: Restarts if memory exceeds 1GB
 - ✅ **Log management**: Separate error and output logs
@@ -185,6 +199,7 @@ pm2 startup
 ## 🧪 **Health Monitoring**
 
 ### **Health Endpoints**
+
 ```bash
 # API Health Check
 curl http://localhost:5001/api/health
@@ -194,6 +209,7 @@ curl http://localhost:5001/api/health/db
 ```
 
 ### **Expected Responses**
+
 ```json
 // API Health
 {
@@ -216,18 +232,21 @@ curl http://localhost:5001/api/health/db
 ## 📊 **Database Migration**
 
 ### **Run Migration**
+
 ```bash
 # Run database migration
 npm run migrate
 ```
 
 ### **Migration Features**
+
 - ✅ **Index Creation**: Performance indexes for all collections
 - ✅ **Collection Verification**: Ensures all required collections exist
 - ✅ **Data Validation**: Checks for existing data
 - ✅ **Error Handling**: Graceful error handling and reporting
 
 ### **Created Indexes**
+
 - **Users**: `email` (unique), `createdAt`
 - **Products**: `category`, `isActive`, `isFeatured`, `isOnSale`, `basePrice`, `createdAt`, text search
 - **Orders**: `userId`, `orderNumber` (unique), `status`, `paymentStatus`, `createdAt`
@@ -238,12 +257,14 @@ npm run migrate
 ## 🔒 **Security Considerations**
 
 ### **Database Security**
+
 - ✅ **Least Privilege**: Use dedicated database user (not admin)
 - ✅ **IP Whitelisting**: Restrict database access to specific IPs
 - ✅ **SSL/TLS**: MongoDB Atlas uses encrypted connections
 - ✅ **Environment Variables**: Sensitive data in environment variables
 
 ### **Application Security**
+
 - ✅ **CORS Configuration**: Restrict to production domains
 - ✅ **Rate Limiting**: Prevent abuse
 - ✅ **Helmet.js**: Security headers
@@ -252,6 +273,7 @@ npm run migrate
 ## 🚀 **Deployment Checklist**
 
 ### **Pre-Deployment**
+
 - [ ] Set up MongoDB Atlas cluster
 - [ ] Create database user with least privileges
 - [ ] Update environment variables
@@ -260,6 +282,7 @@ npm run migrate
 - [ ] Add sample products
 
 ### **Deployment**
+
 - [ ] Install Node.js and PM2 on server
 - [ ] Clone repository
 - [ ] Install dependencies
@@ -269,6 +292,7 @@ npm run migrate
 - [ ] Test all endpoints
 
 ### **Post-Deployment**
+
 - [ ] Verify health endpoints
 - [ ] Test payment flows
 - [ ] Monitor logs
@@ -278,6 +302,7 @@ npm run migrate
 ## 📈 **Monitoring & Maintenance**
 
 ### **Log Management**
+
 ```bash
 # View PM2 logs
 pm2 logs
@@ -290,6 +315,7 @@ pm2 flush
 ```
 
 ### **Performance Monitoring**
+
 ```bash
 # Monitor PM2 processes
 pm2 monit
@@ -313,4 +339,3 @@ Your sastabazar e-commerce website is now fully configured for production deploy
 - ✅ **Security Best Practices**
 
 The application is ready for production deployment! 🚀
-

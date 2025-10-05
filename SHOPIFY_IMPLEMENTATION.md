@@ -5,6 +5,7 @@
 ### **Step 1: Set up Shopify Store**
 
 1. **Create Shopify Account**
+
    ```bash
    # Go to shopify.com and sign up
    # Choose Basic plan ($29/month)
@@ -20,6 +21,7 @@
 ### **Step 2: Configure Storefront API**
 
 1. **Create Private App**
+
    ```bash
    # In Shopify Admin:
    # Settings > Apps and sales channels > Develop apps > Create an app
@@ -58,8 +60,8 @@ REACT_APP_SHOPIFY_STOREFRONT_ACCESS_TOKEN=shpat_xxxxxxxxxxxxxxxxxxxx
 
 ```javascript
 // client/src/pages/Products.jsx
-import { useEffect, useState } from 'react';
-import { shopifyService } from '../services/shopify';
+import { useEffect, useState } from "react";
+import { shopifyService } from "../services/shopify";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -71,12 +73,12 @@ const Products = () => {
       try {
         const [productsData, categoriesData] = await Promise.all([
           shopifyService.getProducts(),
-          shopifyService.getCategories()
+          shopifyService.getCategories(),
         ]);
         setProducts(productsData);
         setCategories(categoriesData);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -92,7 +94,7 @@ const Products = () => {
 
 ```javascript
 // client/src/context/CartContext.jsx
-import { shopifyService } from '../services/shopify';
+import { shopifyService } from "../services/shopify";
 
 const CartProvider = ({ children }) => {
   const [checkout, setCheckout] = useState(null);
@@ -101,7 +103,7 @@ const CartProvider = ({ children }) => {
   // Initialize checkout
   useEffect(() => {
     const initCheckout = async () => {
-      const existingCheckout = localStorage.getItem('shopify_checkout_id');
+      const existingCheckout = localStorage.getItem("shopify_checkout_id");
       if (existingCheckout) {
         const checkoutData = await shopifyService.getCheckout(existingCheckout);
         if (checkoutData) {
@@ -112,7 +114,7 @@ const CartProvider = ({ children }) => {
       const newCheckout = await shopifyService.createCheckout();
       if (newCheckout) {
         setCheckout(newCheckout);
-        localStorage.setItem('shopify_checkout_id', newCheckout.id);
+        localStorage.setItem("shopify_checkout_id", newCheckout.id);
       }
     };
     initCheckout();
@@ -121,19 +123,19 @@ const CartProvider = ({ children }) => {
   // Add to cart
   const addToCart = async (product, variant, quantity = 1) => {
     if (!checkout) return;
-    
+
     setLoading(true);
     try {
       const updatedCheckout = await shopifyService.addToCart(
         checkout.id,
         variant.id,
-        quantity
+        quantity,
       );
       if (updatedCheckout) {
         setCheckout(updatedCheckout);
       }
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      console.error("Error adding to cart:", error);
     } finally {
       setLoading(false);
     }
@@ -147,8 +149,8 @@ const CartProvider = ({ children }) => {
 
 ```javascript
 // client/src/pages/Home.jsx
-import { useEffect, useState } from 'react';
-import { shopifyService } from '../services/shopify';
+import { useEffect, useState } from "react";
+import { shopifyService } from "../services/shopify";
 
 const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -159,12 +161,12 @@ const Home = () => {
       try {
         const [featured, newProducts] = await Promise.all([
           shopifyService.getFeaturedProducts(),
-          shopifyService.getNewArrivals()
+          shopifyService.getNewArrivals(),
         ]);
         setFeaturedProducts(featured);
         setNewArrivals(newProducts);
       } catch (error) {
-        console.error('Error fetching home data:', error);
+        console.error("Error fetching home data:", error);
       }
     };
     fetchData();
@@ -179,6 +181,7 @@ const Home = () => {
 ## 🔧 **Testing the Integration**
 
 ### **1. Test Product Fetching**
+
 ```bash
 # Start your development server
 npm run dev
@@ -188,6 +191,7 @@ npm run dev
 ```
 
 ### **2. Test Cart Operations**
+
 ```bash
 # Try adding products to cart
 # Check if checkout is created
@@ -195,6 +199,7 @@ npm run dev
 ```
 
 ### **3. Test Checkout Process**
+
 ```bash
 # Add items to cart
 # Go to checkout
@@ -211,7 +216,7 @@ npm run dev
 ✅ **Order Management** - Complete order lifecycle  
 ✅ **Analytics & Reports** - Built-in Shopify analytics  
 ✅ **Mobile App** - Shopify mobile app for management  
-✅ **Customer Support** - Shopify's 24/7 support  
+✅ **Customer Support** - Shopify's 24/7 support
 
 ---
 
@@ -257,4 +262,4 @@ npm run dev
 
 ---
 
-**Your sastabazar website will now be powered by Shopify! 🎉** 
+**Your sastabazar website will now be powered by Shopify! 🎉**

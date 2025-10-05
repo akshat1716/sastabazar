@@ -9,6 +9,7 @@ Inspired by high-fashion aesthetics, sastabazar combines clean typography, gener
 ## ✨ Features
 
 ### Core E-commerce
+
 - Multi-category product catalog (Apparel, Home Goods, Tech Accessories, Art & Prints)
 - Secure user authentication with JWT
 - Dynamic product variant selectors
@@ -16,6 +17,7 @@ Inspired by high-fashion aesthetics, sastabazar combines clean typography, gener
 - Responsive design for all devices
 
 ### AI-Powered Features
+
 - **AI Shopping Assistant**: Intelligent chatbot for personalized product recommendations
 - **Visual Search**: Upload images to find similar products
 - **Curated Recommendations**: Personalized suggestions based on browsing history
@@ -31,6 +33,7 @@ Inspired by high-fashion aesthetics, sastabazar combines clean typography, gener
 ## 🚀 Quick Start
 
 1. **Clone and Install**
+
    ```bash
    git clone <repository-url>
    cd aura-ecommerce
@@ -38,12 +41,14 @@ Inspired by high-fashion aesthetics, sastabazar combines clean typography, gener
    ```
 
 2. **Environment Setup**
+
    ```bash
    cp .env.example .env
    # Edit .env with your MongoDB URI and JWT secret
    ```
 
 3. **Start Development**
+
    ```bash
    npm run dev
    ```
@@ -75,16 +80,19 @@ aura-ecommerce/
 ## 🎯 Key Features Implementation
 
 ### AI Shopping Assistant
+
 - Floating chat interface
 - Natural language processing for product queries
 - Cross-category recommendations
 
 ### Visual Search
+
 - Image upload functionality
 - Simulated AI analysis endpoint
 - Visual similarity matching
 
 ### Personalized Recommendations
+
 - User behavior tracking
 - Purchase history analysis
 - Curated product suggestions
@@ -92,6 +100,7 @@ aura-ecommerce/
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```env
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret_key
@@ -100,7 +109,9 @@ NODE_ENV=development
 ```
 
 ### Database Setup
+
 The application uses MongoDB with the following collections:
+
 - `users` - User accounts and preferences
 - `products` - Product catalog with variants
 - `orders` - Order history and tracking
@@ -109,17 +120,20 @@ The application uses MongoDB with the following collections:
 ## 🎨 Design System
 
 ### Color Palette
+
 - Primary: Monochromatic (Black, White, Grey)
 - Accent: Product photography colors
 - Background: Pure white (#FFFFFF)
 - Text: Deep black (#000000)
 
 ### Typography
+
 - Font: Inter (Google Fonts)
 - Weights: 400 (Regular), 500 (Medium), 600 (Semi-bold), 700 (Bold)
 - Sizes: Large, bold headings for impact
 
 ### Animations
+
 - Smooth fade-ins and transitions
 - Hover effects revealing product details
 - Elegant slide-in cart animation
@@ -127,6 +141,7 @@ The application uses MongoDB with the following collections:
 ## 📱 Responsive Design
 
 The application is fully responsive with breakpoints:
+
 - Mobile: 320px - 768px
 - Tablet: 768px - 1024px
 - Desktop: 1024px+
@@ -142,12 +157,14 @@ The application is fully responsive with breakpoints:
 ## 🚀 Deployment
 
 ### Production Build
+
 ```bash
 npm run build
 npm start
 ```
 
 ### Environment Setup
+
 Ensure all environment variables are properly configured for production deployment.
 
 ## 🤝 Contributing
@@ -164,4 +181,4 @@ This project is licensed under the MIT License.
 
 ---
 
-**Aura** - Where design meets intelligence in e-commerce. 
+**Aura** - Where design meets intelligence in e-commerce.

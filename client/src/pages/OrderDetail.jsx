@@ -4,7 +4,7 @@ const OrderDetail = () => {
       <h1 className="text-3xl font-bold mb-6">Order Details</h1>
       <p className="text-aura-600">Order details coming soon.</p>
     </div>
-  )
-}
+  );
+};
 
-export default OrderDetail
+export default OrderDetail;

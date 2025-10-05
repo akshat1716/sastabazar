@@ -4,9 +4,9 @@
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: "Inter", system-ui, sans-serif;
   }
-  
+
   body {
     @apply text-aura-900 bg-white;
   }
@@ -16,34 +16,34 @@
   .btn-primary {
     @apply bg-aura-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-aura-800 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-aura-500 focus:ring-offset-2;
   }
-  
+
   .btn-secondary {
     @apply bg-white text-aura-900 border border-aura-200 px-6 py-3 rounded-lg font-medium hover:bg-aura-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-aura-500 focus:ring-offset-2;
   }
-  
+
   .btn-ghost {
     @apply text-aura-600 hover:text-aura-900 px-3 py-2 rounded-md font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-aura-500 focus:ring-offset-2;
   }
-  
+
   .card {
     @apply bg-white border border-aura-200 rounded-lg shadow-sm;
   }
-  
+
   .input-field {
     @apply w-full px-4 py-3 border border-aura-200 rounded-lg focus:ring-2 focus:ring-aura-500 focus:border-transparent transition-colors duration-200;
   }
-  
+
   .product-card {
     @apply cursor-pointer overflow-hidden;
   }
-  
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   .line-clamp-3 {
     display: -webkit-box;
     -webkit-line-clamp: 3;

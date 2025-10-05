@@ -1,43 +1,44 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Plus, Minus, ShoppingBag } from 'lucide-react'
-import { useCart } from '../context/CartContext'
-import { formatCurrency } from '../services/utils'
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Plus, Minus, ShoppingBag } from "lucide-react";
+import { useCart } from "../context/CartContext";
+import { formatCurrency } from "../services/utils";
 
 const CartSidebar = ({ isOpen, onClose }) => {
-  const { cart, updateCartItem, removeFromCart, clearCart } = useCart()
-  const [isClosing, setIsClosing] = useState(false)
+  const { cart, updateCartItem, removeFromCart, clearCart } = useCart();
+  const [isClosing, setIsClosing] = useState(false);
 
   const handleClose = () => {
-    setIsClosing(true)
+    setIsClosing(true);
     setTimeout(() => {
-      setIsClosing(false)
-      onClose()
-    }, 200)
-  }
+      setIsClosing(false);
+      onClose();
+    }, 200);
+  };
 
   const handleQuantityChange = (itemId, newQuantity) => {
     if (newQuantity < 1) {
-      removeFromCart(itemId)
+      removeFromCart(itemId);
     } else {
-      updateCartItem(itemId, newQuantity)
+      updateCartItem(itemId, newQuantity);
     }
-  }
+  };
 
   const handleClearCart = () => {
-    clearCart()
-    handleClose()
-  }
+    clearCart();
+    handleClose();
+  };
 
   const calculateTotal = () => {
-    if (!cart?.items) return 0
+    if (!cart?.items) return 0;
     return cart.items.reduce((total, item) => {
-      const price = item.selectedVariant?.price || item.productId?.basePrice || 0
-      return total + (price * item.quantity)
-    }, 0)
-  }
+      const price =
+        item.selectedVariant?.price || item.productId?.basePrice || 0;
+      return total + price * item.quantity;
+    }, 0);
+  };
 
-  const total = calculateTotal()
+  const total = calculateTotal();
 
   return (
     <AnimatePresence>
@@ -54,15 +55,17 @@ const CartSidebar = ({ isOpen, onClose }) => {
 
           {/* Sidebar */}
           <motion.div
-            initial={{ x: '100%' }}
+            initial={{ x: "100%" }}
             animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'tween', duration: 0.3 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "tween", duration: 0.3 }}
             className="fixed right-0 top-0 h-full w-96 bg-white shadow-xl z-50 flex flex-col"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-aura-200">
-              <h2 className="text-xl font-semibold text-aura-900">Shopping Cart</h2>
+              <h2 className="text-xl font-semibold text-aura-900">
+                Shopping Cart
+              </h2>
               <button
                 onClick={handleClose}
                 className="p-2 hover:bg-aura-100 rounded-full transition-colors duration-200"
@@ -76,7 +79,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
               {!cart?.items || cart.items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full p-6">
                   <ShoppingBag className="h-16 w-16 text-aura-300 mb-4" />
-                  <h3 className="text-lg font-medium text-aura-600 mb-2">Your cart is empty</h3>
+                  <h3 className="text-lg font-medium text-aura-600 mb-2">
+                    Your cart is empty
+                  </h3>
                   <p className="text-aura-500 text-center">
                     Add some products to get started
                   </p>
@@ -85,9 +90,15 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 <div className="p-6">
                   <div className="space-y-4">
                     {cart.items.map((item) => (
-                      <div key={item._id} className="flex items-start space-x-3 p-3 border border-aura-200 rounded-lg">
+                      <div
+                        key={item._id}
+                        className="flex items-start space-x-3 p-3 border border-aura-200 rounded-lg"
+                      >
                         <img
-                          src={item.productId?.images?.[0]?.url || '/placeholder-product.jpg'}
+                          src={
+                            item.productId?.images?.[0]?.url ||
+                            "/placeholder-product.jpg"
+                          }
                           alt={item.productId?.name}
                           className="w-16 h-16 object-cover border border-aura-200 rounded"
                         />
@@ -97,17 +108,27 @@ const CartSidebar = ({ isOpen, onClose }) => {
                           </h3>
                           {item.selectedVariant && (
                             <p className="text-sm text-aura-600">
-                              {item.selectedVariant.name}: {item.selectedVariant.value}
+                              {item.selectedVariant.name}:{" "}
+                              {item.selectedVariant.value}
                             </p>
                           )}
                           <p className="text-sm font-medium text-aura-900 mt-1">
-                            {formatCurrency((item.selectedVariant?.price || item.productId?.basePrice || 0) * item.quantity)}
+                            {formatCurrency(
+                              (item.selectedVariant?.price ||
+                                item.productId?.basePrice ||
+                                0) * item.quantity,
+                            )}
                           </p>
 
                           <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center space-x-2">
                               <button
-                                onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item._id,
+                                    item.quantity - 1,
+                                  )
+                                }
                                 className="p-1 text-aura-400 hover:text-aura-600 transition-colors duration-200"
                               >
                                 <Minus className="h-4 w-4" />
@@ -116,7 +137,12 @@ const CartSidebar = ({ isOpen, onClose }) => {
                                 {item.quantity}
                               </span>
                               <button
-                                onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
+                                onClick={() =>
+                                  handleQuantityChange(
+                                    item._id,
+                                    item.quantity + 1,
+                                  )
+                                }
                                 className="p-1 text-aura-400 hover:text-aura-600 transition-colors duration-200"
                               >
                                 <Plus className="h-4 w-4" />
@@ -141,7 +167,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
             {cart?.items && cart.items.length > 0 && (
               <div className="border-t border-aura-200 p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <span className="text-lg font-medium text-aura-900">Total</span>
+                  <span className="text-lg font-medium text-aura-900">
+                    Total
+                  </span>
                   <span className="text-lg font-bold text-aura-900">
                     {formatCurrency(total)}
                   </span>
@@ -150,8 +178,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
                 <div className="space-y-3">
                   <button
                     onClick={() => {
-                      handleClose()
-                      window.location.href = '/checkout'
+                      handleClose();
+                      window.location.href = "/checkout";
                     }}
                     className="w-full btn-primary"
                   >
@@ -170,7 +198,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
         </>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default CartSidebar
+export default CartSidebar;

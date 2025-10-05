@@ -4,7 +4,7 @@ const Orders = () => {
       <h1 className="text-3xl font-bold mb-6">Orders</h1>
       <p className="text-aura-600">Order history coming soon.</p>
     </div>
-  )
-}
+  );
+};
 
-export default Orders
+export default Orders;
