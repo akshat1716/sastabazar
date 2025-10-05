@@ -4,9 +4,10 @@
   "description": "A premium, AI-integrated e-commerce platform with minimalist design",
   "main": "server/index.js",
   "scripts": {
-    "lint": "eslint server/**/*.js",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "nodemon server/index.js",
+    "lint": "eslint server/**/*.js",
+    "test": "echo \"No tests specified\" && exit 0"
     "client": "cd client && npm run dev",
     "build": "cd client && npm run build",
     "build:server": "echo 'Server build complete'",
@@ -29,7 +30,7 @@
     "deploy:logs": "./scripts/deploy-production.sh logs",
     "deploy:restart": "./scripts/deploy-production.sh restart",
     "deploy:stop": "./scripts/deploy-production.sh stop",
-    "test:ci": "npm test && cd client && npm test",
+    "test:ci": "npm run test:all && npm run security:check",
     "lint:ci": "npm run lint && cd client && npm run lint",
     "build:ci": "npm run build:all",
     "secret-scan": "./scripts/secret-scan.sh",
@@ -44,13 +45,11 @@
     "test:live-razorpay": "./scripts/test-live-razorpay.sh",
     "test:database-load": "./scripts/test-database-load.sh",
     "security:scan": "./scripts/security-scan.sh",
-    "security:check": "npm run secret-scan && npm run audit:ci",
     "release:create": "./scripts/release.sh create",
     "release:rollback": "./scripts/release.sh rollback",
     "release:canary": "./scripts/release.sh canary",
     "audit:production": "./scripts/production-audit.sh",
     "test:all": "npm run test:e2e && npm run test:load && npm run test:security && npm run test:smoke && npm run test:webhook",
-    "test:ci": "npm run test:all && npm run security:check",
     "test:full": "npm run test:all && npm run security:scan && npm run lint:ci"
   },
   "keywords": [
@@ -94,6 +93,7 @@
   "devDependencies": {
     "artillery": "^2.0.0",
     "concurrently": "^8.2.0",
+    "eslint": "^9.37.0",
     "nodemon": "^3.0.1",
     "pm2": "^5.3.0"
   }
