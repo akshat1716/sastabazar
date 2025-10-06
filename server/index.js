@@ -171,9 +171,7 @@ app.get("/api/health/db", async (req, res) => {
 });
 
 // Serve static files from React app in production
-if (config.nodeEnv === "production") {
-  app.use(express.static(path.join(__dirname, "../client/dist")));
-}
+if (config.nodeEnv === "production") 
 
 // API Routes
 app.use("/api/auth", rateLimits.auth, authRoutes);
@@ -198,9 +196,7 @@ app.use("/api/*", notFoundHandler);
 
 // Serve React app for all non-API routes in production
 if (config.nodeEnv === "production") {
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/dist/index.html"));
-  });
+  
 } else {
   // 404 handler for development
   app.use("*", (req, res) => {
