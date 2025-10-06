@@ -48,7 +48,7 @@ const databaseViewerRoutes = require("./routes/database-viewer");
 const shopifyRoutes = require("./routes/shopify");
 
 const app = express();
-const PORT = process.env.PORT || 3000; // prefer Render PORT
+const PORT = process.env.PORT || 3000;
 const HOST = "0.0.0.0";
 
 /** Health for Render (root) */
@@ -65,12 +65,16 @@ app.use(correlationIdMiddleware);
 app.use(...createSecurityMiddleware());
 app.use(compression());
 
+// Trust proxy for rate limiting (must be before CORS)
+app.set('trust proxy', 1);
+
 // --- START: CORRECTED CORS CONFIGURATION ---
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
   "https://sastabazarecommerce.netlify.app",
   "https://www.sastabazar.co.in",
+  "https://sastabazar.co.in",
   "http://sastabazar.co.in",
 ];
 
@@ -88,7 +92,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// Note: You no longer need app.options('*', cors()) as the line above handles it.
 // --- END: CORRECTED CORS CONFIGURATION ---
 
 // HTTP request logging
@@ -122,9 +125,6 @@ console.log(
       console.log("✅ Mongo connected");
     }
   } catch (e) {
-    // On a failed initial connection, log the error and shut down.
-    // This tells Render that the deploy failed and prevents the app
-    // from running in a broken state.
     console.error(
       "CRITICAL: Initial Mongo connect failed. Shutting down.",
       e?.message || e,
@@ -170,9 +170,6 @@ app.get("/api/health/db", async (req, res) => {
   }
 });
 
-// Serve static files from React app in production
-if (config.nodeEnv === "production") 
-
 // API Routes
 app.use("/api/auth", rateLimits.auth, authRoutes);
 app.use("/api/products", productRoutes);
@@ -194,15 +191,10 @@ app.use(errorHandler);
 // 404 handler for API routes
 app.use("/api/*", notFoundHandler);
 
-// Serve React app for all non-API routes in production
-if (config.nodeEnv === "production") {
-  
-} else {
-  // 404 handler for development
-  app.use("*", (req, res) => {
-    res.status(404).json({ error: "Route not found" });
-  });
-}
+// 404 handler for all other routes
+app.use("*", (req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
 
 const server = app.listen(PORT, HOST, () => {
   logStartup?.("sastabazar-api", "1.0.0", config?.nodeEnv, PORT);
@@ -217,7 +209,6 @@ const gracefulShutdown = (signal) => {
   server.close(() => {
     logger.info("HTTP server closed");
 
-    // Close database connection
     dbConnection
       .disconnect()
       .then(() => {
@@ -230,7 +221,6 @@ const gracefulShutdown = (signal) => {
       });
   });
 
-  // Force close after 10 seconds
   setTimeout(() => {
     logger.error("Forced shutdown after timeout");
     process.exit(1);
