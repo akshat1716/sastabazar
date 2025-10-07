@@ -3,7 +3,7 @@ import axios from "axios";
 // Unified API base URL utility
 const getApiBaseUrl = () => {
   if (process.env.NODE_ENV === "production") {
-    return `${process.env.VITE_SERVER_URL || "https://your-domain.com"}/api`;
+    return `${process.env.VITE_SERVER_URL || "https://sastabazarbackend.onrender.com"}/api`;
   }
   return "http://localhost:5001/api";
 };
