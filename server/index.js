@@ -64,6 +64,7 @@ const allowedOrigins = [
   "https://sastabazarecommerce.netlify.app",
   "https://www.sastabazar.co.in",
   "http://sastabazar.co.in",
+  "https://sastabazar.co.in", // <-- This was the missing URL
 ];
 const corsOptions = {
   origin: (origin, callback) => {
