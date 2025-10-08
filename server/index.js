@@ -24,9 +24,9 @@ const {
   logHealthCheck,
 } = require("./config/logger");
 //const {
-  //sentryMiddleware,
-  //errorReportingMiddleware,
-  //performanceMiddleware,
+//sentryMiddleware,
+//errorReportingMiddleware,
+//performanceMiddleware,
 //} = require("./config/sentry");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
@@ -66,7 +66,7 @@ app.use(...createSecurityMiddleware());
 app.use(compression());
 
 // Trust proxy for rate limiting (must be before CORS)
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 // --- START: CORRECTED CORS CONFIGURATION ---
 const allowedOrigins = [
@@ -98,7 +98,7 @@ app.use(cors(corsOptions));
 app.use(httpLogger);
 
 // Performance monitoring
-app.use(performanceMiddleware);
+//app.use(performanceMiddleware);
 
 // General rate limiting
 app.use("/api/", rateLimits.general);

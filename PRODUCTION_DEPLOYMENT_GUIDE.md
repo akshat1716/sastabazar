@@ -103,6 +103,7 @@ npm run logs:pm2
    ```
 
 3. **Configure Nginx** (Optional):
+
    ```nginx
    server {
        listen 80;

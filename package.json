@@ -30,7 +30,7 @@
     "deploy:health": "./scripts/deploy-production.sh health",
     "deploy:logs": "./scripts/deploy-production.sh logs",
     "deploy:restart": "./scripts/deploy-production.sh restart"
-},
+  },
   "keywords": [
     "ecommerce",
     "mern",
