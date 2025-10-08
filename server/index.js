@@ -23,11 +23,11 @@ const {
   logShutdown,
   logHealthCheck,
 } = require("./config/logger");
-const {
-  sentryMiddleware,
-  errorReportingMiddleware,
-  performanceMiddleware,
-} = require("./config/sentry");
+//const {
+  //sentryMiddleware,
+  //errorReportingMiddleware,
+  //performanceMiddleware,
+//} = require("./config/sentry");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
 // Validate configuration
@@ -55,8 +55,8 @@ const HOST = "0.0.0.0";
 app.get("/health", (_req, res) => res.status(200).json({ ok: true }));
 
 // Sentry middleware (must be first)
-app.use(sentryMiddleware.requestHandler);
-app.use(sentryMiddleware.tracingHandler);
+//app.use(sentryMiddleware.requestHandler);
+//app.use(sentryMiddleware.tracingHandler);
 
 // Correlation ID middleware
 app.use(correlationIdMiddleware);
