@@ -185,7 +185,7 @@ app.use("/api/db", databaseViewerRoutes);
 app.use("/api/shopify", shopifyRoutes);
 
 // Error reporting & handling
-app.use(errorReportingMiddleware);
+//app.use(errorReportingMiddleware);
 app.use(errorHandler);
 
 // 404 handler for API routes
